@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; img-src * data: blob:; connect-src *;">
     <title>🖼️ Pixel Vault 2044</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +17,6 @@
     <div id="particlesContainer"></div>
 
     <div class="app">
-        <!-- Header -->
         <div class="header">
             <div class="header-left">
                 <div class="logo">🖼️</div>
@@ -30,7 +30,6 @@
             </div>
         </div>
 
-        <!-- Image Preview -->
         <div class="visualizer-3d" id="visualizer3D">
             <canvas id="vizCanvas"></canvas>
             <img class="preview-img" id="previewImg" alt="">
@@ -46,7 +45,6 @@
             </div>
         </div>
 
-        <!-- Progress / Upload bar -->
         <div class="progress-section">
             <div class="progress-track">
                 <div class="progress-fill" id="progressFill"></div>
@@ -54,7 +52,6 @@
             <div class="progress-status" id="progressStatus">جاهز للرفع</div>
         </div>
 
-        <!-- Controls -->
         <div class="controls">
             <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn" title="نسخ تلقائي"><i class="fas fa-copy"></i></button>
             <button class="ctrl-btn" onclick="prevImage()"><i class="fas fa-backward-step"></i></button>
@@ -64,7 +61,6 @@
             <button class="ctrl-btn" onclick="deleteCurrent()" title="حذف"><i class="fas fa-trash"></i></button>
         </div>
 
-        <!-- Info Panel -->
         <div class="lyrics-panel" id="infoPanel" style="display:none">
             <div class="lyrics-header">
                 <h3>ℹ️ عن التطبيق</h3>
@@ -74,11 +70,10 @@
                 <p class="lyrics-line">🔗 كل صورة تحصل على رابط مباشر</p>
                 <p class="lyrics-line">📋 انسخ أو شارك أو احذف</p>
                 <p class="lyrics-line">💾 معرضك محفوظ محليًا</p>
-                <p class="lyrics-line">☁️ مضبوط مسبقًا على حسابك</p>
+                <p class="lyrics-line">☁️ مرتبط بحساب Cloudinary</p>
             </div>
         </div>
 
-        <!-- Gallery -->
         <div class="playlist-section">
             <div class="playlist-header">
                 <h3>🖼️ معرض الصور</h3>

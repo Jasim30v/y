@@ -14,6 +14,7 @@ function toggleAutoCopy(){
 
 function showToast(m){
     const t=document.getElementById('toast');
+    if(!t)return;
     t.textContent=m;
     t.classList.add('show');
     clearTimeout(window._toastTimer);
@@ -21,13 +22,14 @@ function showToast(m){
 }
 
 // ─── التهيئة ───
-initParticles();
-initVisualizer();
-initGallery();
+window.addEventListener('DOMContentLoaded',()=>{
+    initParticles();
+    initVisualizer();
+    initGallery();
 
-// استعادة حالة النسخ التلقائي
-const _s=loadSettings();
-if(_s.autoCopy)document.getElementById('autoCopyBtn').classList.add('active');
+    const s=loadSettings();
+    if(s.autoCopy)document.getElementById('autoCopyBtn').classList.add('active');
 
-console.log('%c🖼️ Pixel Vault 2044 Ready','color:#00ffcc;font-size:16px;font-weight:bold');
-console.log('%c☁️ Cloudinary: dhu9l0lfs','color:#6366f1');
+    console.log('%c🖼️ Pixel Vault 2044 Ready','color:#00ffcc;font-size:16px;font-weight:bold');
+    console.log('%c☁️ Cloudinary: dhu9l0lfs','color:#6366f1');
+});

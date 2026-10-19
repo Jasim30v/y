@@ -51,9 +51,7 @@ function drawViz(){
 }
 
 function pulseViz(){
-    for(let i=0;i<vizData.length;i++){
-        vizData[i]=Math.random()*0.6+0.1;
-    }
+    for(let i=0;i<vizData.length;i++)vizData[i]=Math.random()*0.6+0.1;
     setTimeout(()=>{for(let i=0;i<vizData.length;i++)vizData[i]*=0.5},300);
 }
 
@@ -61,6 +59,7 @@ function showPreview(url,name){
     const box=document.getElementById('visualizer3D');
     if(!url){
         box.classList.remove('has-image');
+        previewImg.removeAttribute('src');
         document.getElementById('trackTitle').innerText='اختر صورة';
         document.getElementById('trackArtist').innerText='Pixel Vault 2044';
         document.getElementById('currentTime').innerText='—';
