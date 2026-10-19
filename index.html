@@ -17,7 +17,6 @@
     <div id="particlesContainer"></div>
 
     <div class="app">
-        <!-- Header -->
         <div class="header">
             <div class="header-left">
                 <div class="logo">🧠</div>
@@ -32,7 +31,6 @@
             </div>
         </div>
 
-        <!-- Image Preview -->
         <div class="visualizer-3d" id="visualizer3D">
             <canvas id="vizCanvas"></canvas>
             <img class="preview-img" id="previewImg" alt="">
@@ -48,7 +46,6 @@
             </div>
         </div>
 
-        <!-- Progress -->
         <div class="progress-section">
             <div class="progress-track">
                 <div class="progress-fill" id="progressFill"></div>
@@ -56,7 +53,6 @@
             <div class="progress-status" id="progressStatus">جاهز</div>
         </div>
 
-        <!-- Controls -->
         <div class="controls">
             <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn" title="نسخ تلقائي"><i class="fas fa-copy"></i></button>
             <button class="ctrl-btn" onclick="prevImage()"><i class="fas fa-backward-step"></i></button>
@@ -66,7 +62,6 @@
             <button class="ctrl-btn" onclick="deleteCurrent()" title="حذف"><i class="fas fa-trash"></i></button>
         </div>
 
-        <!-- AI Action Bar -->
         <div class="ai-action-bar">
             <button class="ai-btn gemini-btn" onclick="openChat()">
                 <i class="fas fa-comments"></i> دردشة Gemini
@@ -84,15 +79,20 @@
             </button>
         </div>
 
-        <!-- AI Settings Panel -->
+        <!-- AI Settings Panel (مُعدّل) -->
         <div class="lyrics-panel" id="aiSettingsPanel" style="display:none">
             <div class="lyrics-header">
                 <h3>🧠 إعدادات الذكاء الاصطناعي</h3>
             </div>
             <div class="lyrics-content">
-                <p class="ai-label">مفتاح Gemini API (للتحليل والدردشة):</p>
+                <p class="ai-label">مفتاح Gemini API:</p>
                 <input type="password" class="ai-input" id="geminiKey" placeholder="AIza...">
                 <p class="ai-hint">🔗 احصل عليه من: https://aistudio.google.com/apikey</p>
+
+                <!-- ✅ حقل جديد: اسم الموديل -->
+                <p class="ai-label">اسم الموديل (Model):</p>
+                <input type="text" class="ai-input" id="geminiModel" placeholder="gemini-2.5-flash">
+                <p class="ai-hint">💡 إذا فشل الموديل، جرّب: gemini-2.5-flash-lite أو gemini-flash-latest</p>
 
                 <p class="ai-label">لغة الردود:</p>
                 <select class="ai-select" id="aiLang">
@@ -104,22 +104,18 @@
             </div>
         </div>
 
-        <!-- Chat Panel -->
         <div class="lyrics-panel chat-panel" id="chatPanel" style="display:none">
             <div class="lyrics-header">
                 <h3><i class="fas fa-comments"></i> دردشة Gemini</h3>
                 <button class="btn-action small" onclick="closeChat()">✕</button>
             </div>
-            <div class="chat-messages" id="chatMessages">
-                <!-- الرسائل تظهر هنا -->
-            </div>
+            <div class="chat-messages" id="chatMessages"></div>
             <div class="chat-input-row">
                 <input type="text" id="chatInput" class="ai-input" placeholder="اسأل عن الصورة..." onkeypress="if(event.key==='Enter')sendChatMessage()">
                 <button class="btn-send" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
 
-        <!-- AI Result Panel (للوصف السريع) -->
         <div class="ai-result-panel" id="aiResultPanel" style="display:none">
             <div class="ai-result-header">
                 <h3><i class="fas fa-brain"></i> نتيجة الوصف</h3>
@@ -134,7 +130,6 @@
             </div>
         </div>
 
-        <!-- Info Panel -->
         <div class="lyrics-panel" id="infoPanel" style="display:none">
             <div class="lyrics-header">
                 <h3>ℹ️ عن التطبيق</h3>
@@ -148,7 +143,6 @@
             </div>
         </div>
 
-        <!-- Gallery -->
         <div class="playlist-section">
             <div class="playlist-header">
                 <h3>🖼️ معرض الصور</h3>

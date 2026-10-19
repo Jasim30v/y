@@ -1,12 +1,13 @@
 // ═══════════════════════════════════════════════════════════
-// 🧠 AI Vision Module
+// 🧠 AI Vision Module - Flexible Model
 // ═══════════════════════════════════════════════════════════
-let aiConfig = {geminiKey:'',lang:'ar'};
+let aiConfig = {geminiKey:'',geminiModel:'gemini-2.5-flash',lang:'ar'};
 let lastAIResult = '';
 
 function initAI(){
     aiConfig = loadAIConfig();
     document.getElementById('geminiKey').value = aiConfig.geminiKey||'';
+    document.getElementById('geminiModel').value = aiConfig.geminiModel||'gemini-2.5-flash';
     document.getElementById('aiLang').value = aiConfig.lang||'ar';
 }
 
@@ -25,16 +26,17 @@ function toggleAISettings(){
 function saveAISettings(){
     aiConfig = {
         geminiKey: document.getElementById('geminiKey').value.trim(),
+        geminiModel: document.getElementById('geminiModel').value.trim() || 'gemini-2.5-flash',
         lang: document.getElementById('aiLang').value
     };
     saveAIConfig(aiConfig);
-    showToast('✅ تم حفظ الإعدادات');
+    showToast('✅ تم الحفظ');
     document.getElementById('aiSettingsPanel').style.display='none';
     document.getElementById('btnAI').classList.remove('active');
 }
 
 // ═══════════════════════════════════════════════════════════
-// 📤 مشاركة الصورة إلى تطبيق خارجي (Gemini / ChatGPT)
+// 📤 مشاركة الصورة
 // ═══════════════════════════════════════════════════════════
 async function shareImageToAI(siteName){
     if(currentIndex<0||!gallery[currentIndex]){
@@ -42,19 +44,13 @@ async function shareImageToAI(siteName){
         return;
     }
     const img = gallery[currentIndex];
-    showToast(`⏳ جاري تجهيز الصورة...`);
-
+    showToast('⏳ جاري تجهيز الصورة...');
     try {
         const response = await fetch(img.url, { mode: 'cors' });
         const blob = await response.blob();
         const file = new File([blob], img.name || 'image.jpg', { type: blob.type });
-
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-                files: [file],
-                title: 'تحليل صورة',
-                text: 'قم بتحليل هذه الصورة'
-            });
+            await navigator.share({ files: [file], title: 'تحليل صورة', text: 'قم بتحليل هذه الصورة' });
             showToast(`✅ اختر ${siteName} من القائمة`);
         } else {
             showToast('⚠️ جهازك لا يدعم المشاركة');
@@ -69,7 +65,7 @@ async function sendToGemini(){ await shareImageToAI('Gemini'); }
 async function sendToChatGPT(){ await shareImageToAI('ChatGPT'); }
 
 // ═══════════════════════════════════════════════════════════
-// 🧠 الوصف السريع (Quick Analyze)
+// 🧠 الوصف السريع
 // ═══════════════════════════════════════════════════════════
 function getPrompt(){
     if(aiConfig.lang==='en') return 'Describe this image in detail.';
@@ -77,7 +73,7 @@ function getPrompt(){
 }
 
 async function analyzeWithGemini(imageUrl, customPrompt=null){
-    if(!aiConfig.geminiKey) throw new Error('أدخل مفتاح Gemini أولاً (زر 🤖)');
+    if(!aiConfig.geminiKey) throw new Error('أدخل مفتاح Gemini أولاً');
 
     const imgResp = await fetch(imageUrl, {mode:'cors'});
     if(!imgResp.ok) throw new Error('تعذر تحميل الصورة');
@@ -90,7 +86,9 @@ async function analyzeWithGemini(imageUrl, customPrompt=null){
     });
     const mime = blob.type || 'image/jpeg';
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${aiConfig.geminiKey}`;
+    // ✅ استخدام الموديل من الإعدادات
+    const model = aiConfig.geminiModel || 'gemini-2.5-flash';
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${aiConfig.geminiKey}`;
     const body = {
         contents:[{
             parts:[

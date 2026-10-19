@@ -1,20 +1,13 @@
 // ═══════════════════════════════════════════════════════════
-// 💬 Chat Module - دردشة تفاعلية مع Gemini حول الصورة
+// 💬 Chat Module - Flexible Model
 // ═══════════════════════════════════════════════════════════
 let chatHistory = [];
 let chatImageBase64 = null;
 let chatImageMime = null;
 
 function openChat(){
-    if(currentIndex<0||!gallery[currentIndex]){
-        showToast('⚠️ اختر صورة أولاً');
-        return;
-    }
-    if(!aiConfig.geminiKey){
-        showToast('⚠️ أدخل مفتاح Gemini أولاً');
-        toggleAISettings();
-        return;
-    }
+    if(currentIndex<0||!gallery[currentIndex]){ showToast('⚠️ اختر صورة أولاً'); return; }
+    if(!aiConfig.geminiKey){ showToast('⚠️ أدخل مفتاح Gemini أولاً'); toggleAISettings(); return; }
     document.getElementById('chatPanel').style.display='flex';
     document.getElementById('aiResultPanel').style.display='none';
     document.getElementById('aiSettingsPanel').style.display='none';
@@ -22,16 +15,13 @@ function openChat(){
     resetChat();
 }
 
-function closeChat(){
-    document.getElementById('chatPanel').style.display='none';
-}
+function closeChat(){ document.getElementById('chatPanel').style.display='none'; }
 
 async function resetChat(){
     chatHistory = [];
     const img = gallery[currentIndex];
     const container = document.getElementById('chatMessages');
     container.innerHTML = '<div class="chat-msg ai-msg">⏳ جاري قراءة الصورة...</div>';
-    
     try{
         const resp = await fetch(img.url, {mode:'cors'});
         const blob = await resp.blob();
@@ -43,7 +33,7 @@ async function resetChat(){
             r.readAsDataURL(blob);
         });
         container.innerHTML = '';
-        addChatMessage('ai', '✅ تم تحميل الصورة! اسألني أي شيء عنها.\n(مثال: ماذا يوجد فيها؟ / اقرأ النص / صف الألوان)');
+        addChatMessage('ai', '✅ تم تحميل الصورة! اسألني أي شيء عنها.');
     }catch(e){
         container.innerHTML = '';
         addChatMessage('ai', '❌ فشل تحميل الصورة: '+e.message);
@@ -64,22 +54,17 @@ async function sendChatMessage(){
     const input = document.getElementById('chatInput');
     const msg = input.value.trim();
     if(!msg) return;
-    if(!chatImageBase64){
-        showToast('⏳ انتظر تحميل الصورة');
-        return;
-    }
+    if(!chatImageBase64){ showToast('⏳ انتظر تحميل الصورة'); return; }
 
     addChatMessage('user', msg);
     input.value = '';
-    
     const typingEl = addChatMessage('ai', '...');
     typingEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> يفكر...';
 
-    // إضافة سؤال المستخدم للتاريخ
-    chatHistory.push({role:'user', text:msg});
-
     try{
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${aiConfig.geminiKey}`;
+        // ✅ استخدام الموديل من الإعدادات
+        const model = aiConfig.geminiModel || 'gemini-2.5-flash';
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${aiConfig.geminiKey}`;
         const body = {
             contents: [{
                 parts: [
@@ -102,7 +87,6 @@ async function sendChatMessage(){
 
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'لم يتم استلام رد.';
         typingEl.textContent = reply;
-        chatHistory.push({role:'ai', text:reply});
     }catch(e){
         typingEl.textContent = '❌ خطأ: '+e.message;
     }
