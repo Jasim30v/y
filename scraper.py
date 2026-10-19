@@ -3,13 +3,10 @@
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                            ║
 ║  🖼️  PIXEL VAULT 2044 - CLOUD IMAGE VAULT  🖼️           ║
-║     Generator - 9 Files                                    ║
+║     Ready-to-Build Generator                               ║
 ║                                                            ║
-║  📤  رفع صور سحابي (Cloudinary)                          ║
-║  🔗  توليد روابط مباشرة لكل صورة                          ║
-║  📋  نسخ / مشاركة / حذف                                    ║
-║  💾  معرض محلي مع تخزين دائم                               ║
-║  🎨  تصميم Glass Morphism نفسه                            ║
+║  ☁️  Cloudinary: dhu9l0lfs                                 ║
+║  🔑 Upload Preset: go_fk3                                  ║
 ║                                                            ║
 ╚══════════════════════════════════════════════════════════════╝
 """
@@ -17,6 +14,12 @@
 import os
 
 TOTAL_LINES = 0
+
+# ═══════════════════════════════════════════════════════════
+# 🔑 إعداداتك الجاهزة
+# ═══════════════════════════════════════════════════════════
+CLOUD_NAME = "dhu9l0lfs"
+UPLOAD_PRESET = "go_fk3"
 
 def write(filename, content):
     global TOTAL_LINES
@@ -65,7 +68,6 @@ def build_index():
                 </div>
             </div>
             <div class="header-right">
-                <button class="btn-icon" onclick="toggleSettings()" id="btnSettings"><i class="fas fa-cog"></i></button>
                 <button class="btn-icon" onclick="toggleInfo()" id="btnInfo"><i class="fas fa-circle-info"></i></button>
             </div>
         </div>
@@ -73,6 +75,7 @@ def build_index():
         <!-- Image Preview -->
         <div class="visualizer-3d" id="visualizer3D">
             <canvas id="vizCanvas"></canvas>
+            <img class="preview-img" id="previewImg" alt="">
             <div class="viz-overlay">
                 <div class="track-info">
                     <div class="track-title" id="trackTitle">اختر صورة</div>
@@ -87,35 +90,20 @@ def build_index():
 
         <!-- Progress / Upload bar -->
         <div class="progress-section">
-            <div class="progress-track" id="progressTrack">
+            <div class="progress-track">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="progress-status" id="progressStatus">جاهز</div>
+            <div class="progress-status" id="progressStatus">جاهز للرفع</div>
         </div>
 
         <!-- Controls -->
         <div class="controls">
-            <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn"><i class="fas fa-copy"></i></button>
+            <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn" title="نسخ تلقائي"><i class="fas fa-copy"></i></button>
             <button class="ctrl-btn" onclick="prevImage()"><i class="fas fa-backward-step"></i></button>
-            <button class="ctrl-play" id="uploadBtn" onclick="document.getElementById('imageInput').click()"><i class="fas fa-cloud-arrow-up" id="playIcon"></i></button>
+            <button class="ctrl-play" id="uploadBtn" onclick="document.getElementById('imageInput').click()"><i class="fas fa-cloud-arrow-up"></i></button>
             <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this)">
             <button class="ctrl-btn" onclick="nextImage()"><i class="fas fa-forward-step"></i></button>
-            <button class="ctrl-btn" onclick="deleteCurrent()" id="deleteBtn"><i class="fas fa-trash"></i></button>
-        </div>
-
-        <!-- Settings Panel (Cloudinary) -->
-        <div class="eq-panel" id="settingsPanel" style="display:none">
-            <div class="eq-header">
-                <h3>⚙️ إعدادات الرفع السحابي</h3>
-            </div>
-            <div class="settings-body">
-                <label class="settings-label">Cloud Name</label>
-                <input type="text" class="settings-input" id="cloudNameInput" placeholder="مثال: mycloud123">
-                <label class="settings-label">Upload Preset (Unsigned)</label>
-                <input type="text" class="settings-input" id="uploadPresetInput" placeholder="مثال: sonic_unsigned">
-                <button class="btn-action wide" onclick="saveCloudSettings()">💾 حفظ الإعدادات</button>
-                <p class="settings-hint">احصل على هذه القيم من cloudinary.com → Settings → Upload → Add upload preset (Unsigned).</p>
-            </div>
+            <button class="ctrl-btn" onclick="deleteCurrent()" title="حذف"><i class="fas fa-trash"></i></button>
         </div>
 
         <!-- Info Panel -->
@@ -128,6 +116,7 @@ def build_index():
                 <p class="lyrics-line">🔗 كل صورة تحصل على رابط مباشر</p>
                 <p class="lyrics-line">📋 انسخ أو شارك أو احذف</p>
                 <p class="lyrics-line">💾 معرضك محفوظ محليًا</p>
+                <p class="lyrics-line">☁️ مضبوط مسبقًا على حسابك</p>
             </div>
         </div>
 
@@ -140,7 +129,7 @@ def build_index():
             <div class="playlist image-gallery" id="imageGallery">
                 <div class="empty-playlist">
                     <span>🖼️</span>
-                    <p>ارفع أول صورة لك</p>
+                    <p>اضغط الزر الأزرق لرفع أول صورة</p>
                 </div>
             </div>
         </div>
@@ -188,11 +177,11 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* Image Preview */
 .visualizer-3d{position:relative;width:100%;aspect-ratio:1;max-height:350px;background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:10px}
-.visualizer-3d canvas{width:100%;height:100%;display:none}
-.visualizer-3d .preview-img{width:100%;height:100%;object-fit:cover;display:none}
+.visualizer-3d canvas{width:100%;height:100%;display:block}
+.visualizer-3d .preview-img{width:100%;height:100%;object-fit:cover;display:none;position:absolute;inset:0}
 .visualizer-3d.has-image .preview-img{display:block}
 .visualizer-3d.has-image canvas{display:none}
-.viz-overlay{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top,rgba(5,5,16,0.9),transparent)}
+.viz-overlay{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top,rgba(5,5,16,0.9),transparent);z-index:2}
 .track-title{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:var(--accent);margin-bottom:2px;text-shadow:0 0 20px rgba(0,255,204,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .track-artist{font-size:11px;color:var(--text2)}
 .track-time{display:flex;justify-content:space-between;font-family:'Orbitron',sans-serif;font-size:10px;color:var(--accent2);margin-top:6px}
@@ -208,23 +197,14 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .ctrl-btn{width:42px;height:42px;background:var(--card2);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--text2);transition:all 0.3s}
 .ctrl-btn:hover{border-color:var(--accent);color:var(--accent)}
 .ctrl-btn.active{border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px rgba(0,255,204,0.3)}
-.ctrl-play{width:60px;height:60px;background:linear-gradient(135deg,var(--accent),var(--accent4));border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;color:#000;box-shadow:0 8px 30px rgba(0,255,204,0.3);transition:all 0.3s}
+.ctrl-play{width:60px;height:60px;background:linear-gradient(135deg,var(--accent),var(--accent4));border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;color:#000;box-shadow:0 8px 30px rgba(0,255,204,0.3);transition:all 0.3s}
 .ctrl-play:hover{transform:scale(1.05);box-shadow:0 12px 40px rgba(99,102,241,0.5)}
 .ctrl-play:active{transform:scale(0.95)}
-
-/* Settings Panel */
-.eq-panel{background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;animation:slideDown 0.4s ease}
-@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:600px}}
-.eq-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.eq-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--accent)}
-.settings-body{display:flex;flex-direction:column;gap:8px}
-.settings-label{font-size:11px;color:var(--text2);font-family:'Cairo',sans-serif}
-.settings-input{padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;outline:none}
-.settings-input:focus{border-color:var(--accent);box-shadow:0 0 15px rgba(0,255,204,0.2)}
-.settings-hint{font-size:9px;color:var(--text3);margin-top:4px;line-height:1.6}
+.ctrl-play:disabled{opacity:0.5;cursor:not-allowed;transform:none}
 
 /* Info Panel */
 .lyrics-panel{background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;max-height:300px;overflow-y:auto;animation:slideDown 0.4s ease}
+@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:300px}}
 .lyrics-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .lyrics-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--accent2)}
 .lyrics-line{padding:6px 0;font-size:12px;color:var(--text2);text-align:center;border-bottom:1px solid rgba(255,255,255,0.03)}
@@ -235,16 +215,15 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .playlist-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
 .btn-action{padding:7px 14px;background:var(--card2);border:1px solid var(--border);color:var(--accent);cursor:pointer;border-radius:20px;font-size:10px;font-family:'Cairo',sans-serif;transition:all 0.3s}
 .btn-action:hover{border-color:var(--accent);box-shadow:0 0 15px rgba(0,255,204,0.2)}
-.btn-action.wide{width:100%;margin-top:6px}
 .image-gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.img-card{position:relative;border-radius:var(--radius-sm);overflow:hidden;background:var(--card2);border:1px solid var(--border);transition:all 0.3s;cursor:pointer}
+.img-card{position:relative;border-radius:var(--radius-sm);overflow:hidden;background:var(--card2);border:1px solid var(--border);transition:all 0.3s;cursor:pointer;aspect-ratio:1}
 .img-card:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(0,255,204,0.2)}
 .img-card.selected{border-color:var(--accent);box-shadow:0 0 25px rgba(0,255,204,0.4)}
-.img-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
-.img-card .img-name{position:absolute;top:0;left:0;right:0;padding:6px 8px;background:linear-gradient(to bottom,rgba(0,0,0,0.85),transparent);font-size:9px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.img-card .img-actions{position:absolute;bottom:0;left:0;right:0;display:flex;gap:3px;padding:5px;background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);opacity:0;transition:0.3s}
+.img-card img{width:100%;height:100%;object-fit:cover;display:block}
+.img-card .img-name{position:absolute;top:0;left:0;right:0;padding:6px 8px;background:linear-gradient(to bottom,rgba(0,0,0,0.85),transparent);font-size:9px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:2}
+.img-card .img-actions{position:absolute;bottom:0;left:0;right:0;display:flex;gap:3px;padding:5px;background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);opacity:0;transition:0.3s;z-index:2}
 .img-card:hover .img-actions,.img-card.selected .img-actions{opacity:1}
-.img-card .img-actions button{flex:1;background:rgba(0,255,204,0.2);border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:5px 2px;font-size:8px;cursor:pointer;font-family:'Cairo',sans-serif}
+.img-card .img-actions button{flex:1;background:rgba(0,255,204,0.2);border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:6px 2px;font-size:8px;cursor:pointer;font-family:'Cairo',sans-serif}
 .img-card .img-actions button.danger{background:rgba(255,68,68,0.2);border-color:#ff4466;color:#ff4466}
 .empty-playlist{text-align:center;padding:30px;color:var(--text3);grid-column:1/-1}
 .empty-playlist span{font-size:40px;display:block;margin-bottom:8px}
@@ -268,7 +247,7 @@ function saveGallery(g){return saveData(KEYS.gallery,g)}
 function loadGallery(){return loadData(KEYS.gallery,[])}
 
 function saveSettings(s){return saveData(KEYS.settings,s)}
-function loadSettings(){return loadData(KEYS.settings,{cloudName:'',uploadPreset:'',autoCopy:false})}"""
+function loadSettings(){return loadData(KEYS.settings,{autoCopy:false})}"""
 
 # ═══════════════════════════════════════════════════════════
 # ✨ 4. particles.js
@@ -278,20 +257,79 @@ def build_particles_js():
     return """function initParticles(){const c=document.getElementById('particlesContainer');c.innerHTML='';const cols=['#00ffcc','#ff44aa','#6366f1'];for(let i=0;i<40;i++){const p=document.createElement('div');p.className='particle';p.style.cssText=`left:${Math.random()*100}%;bottom:-10px;width:${Math.random()*4+1}px;height:${Math.random()*4+1}px;background:radial-gradient(circle,${cols[i%3]} 0%,transparent 70%);animation:particleFloat ${Math.random()*5+5}s ease-in infinite;animation-delay:${Math.random()*5}s`;c.appendChild(p)}}"""
 
 # ═══════════════════════════════════════════════════════════
-# 🎨 5. visualizer.js  (placeholder – عرض الصورة المحددة)
+# 🎨 5. visualizer.js
 # ═══════════════════════════════════════════════════════════
 
 def build_visualizer_js():
-    return """let previewImg=null;
+    return """let vizCanvas,vizCtx,vizData=[],previewImg=null;
+
 function initVisualizer(){
-    const box=document.getElementById('visualizer3D');
-    previewImg=document.createElement('img');
-    previewImg.className='preview-img';
-    box.insertBefore(previewImg,box.firstChild);
+    vizCanvas=document.getElementById('vizCanvas');
+    vizCtx=vizCanvas.getContext('2d');
+    previewImg=document.getElementById('previewImg');
+    resizeViz();
+    window.addEventListener('resize',resizeViz);
+    for(let i=0;i<128;i++)vizData.push(0);
+    drawViz();
 }
+
+function resizeViz(){
+    const c=vizCanvas.parentElement;
+    vizCanvas.width=c.clientWidth;
+    vizCanvas.height=c.clientHeight;
+}
+
+function drawViz(){
+    requestAnimationFrame(drawViz);
+    if(!vizCtx)return;
+    const w=vizCanvas.width,h=vizCanvas.height;
+    vizCtx.fillStyle='rgba(5,5,16,0.3)';
+    vizCtx.fillRect(0,0,w,h);
+    const cx=w/2,cy=h/2,r=Math.min(w,h)*0.3;
+    for(let i=0;i<vizData.length;i++){
+        const a=(i/vizData.length)*Math.PI*2;
+        const val=vizData[i]*0.7;
+        const x1=cx+Math.cos(a)*(r+val*30);
+        const y1=cy+Math.sin(a)*(r+val*30);
+        const x2=cx+Math.cos(a)*(r-val*20);
+        const y2=cy+Math.sin(a)*(r-val*20);
+        const grad=vizCtx.createLinearGradient(x1,y1,x2,y2);
+        grad.addColorStop(0,`rgba(0,255,204,${0.3+val})`);
+        grad.addColorStop(0.5,`rgba(99,102,241,${0.2+val})`);
+        grad.addColorStop(1,`rgba(255,68,170,${0.1+val})`);
+        vizCtx.beginPath();
+        vizCtx.moveTo(x1,y1);
+        vizCtx.lineTo(x2,y2);
+        vizCtx.strokeStyle=grad;
+        vizCtx.lineWidth=1+val;
+        vizCtx.stroke();
+    }
+    vizCtx.beginPath();
+    vizCtx.arc(cx,cy,5,0,Math.PI*2);
+    vizCtx.fillStyle='#fff';
+    vizCtx.shadowColor='#00ffcc';
+    vizCtx.shadowBlur=20;
+    vizCtx.fill();
+    vizCtx.shadowBlur=0;
+}
+
+function pulseViz(){
+    for(let i=0;i<vizData.length;i++){
+        vizData[i]=Math.random()*0.6+0.1;
+    }
+    setTimeout(()=>{for(let i=0;i<vizData.length;i++)vizData[i]*=0.5},300);
+}
+
 function showPreview(url,name){
     const box=document.getElementById('visualizer3D');
-    if(!url){box.classList.remove('has-image');document.getElementById('trackTitle').innerText='اختر صورة';document.getElementById('trackArtist').innerText='Pixel Vault 2044';return}
+    if(!url){
+        box.classList.remove('has-image');
+        document.getElementById('trackTitle').innerText='اختر صورة';
+        document.getElementById('trackArtist').innerText='Pixel Vault 2044';
+        document.getElementById('currentTime').innerText='—';
+        document.getElementById('totalTime').innerText='—';
+        return;
+    }
     previewImg.src=url;
     box.classList.add('has-image');
     document.getElementById('trackTitle').innerText=name||'صورة';
@@ -299,66 +337,71 @@ function showPreview(url,name){
 }"""
 
 # ═══════════════════════════════════════════════════════════
-# ☁️ 6. uploader.js (رفع سحابي)
+# ☁️ 6. uploader.js
 # ═══════════════════════════════════════════════════════════
 
 def build_uploader_js():
-    return """let cloudName='',uploadPreset='';
-
-function loadCloudConfig(){
-    const s=loadSettings();
-    cloudName=s.cloudName||'';
-    uploadPreset=s.uploadPreset||'';
-    document.getElementById('cloudNameInput').value=cloudName;
-    document.getElementById('uploadPresetInput').value=uploadPreset;
-    document.getElementById('autoCopyBtn').classList.toggle('active',!!s.autoCopy);
-}
-
-function saveCloudSettings(){
-    cloudName=document.getElementById('cloudNameInput').value.trim();
-    uploadPreset=document.getElementById('uploadPresetInput').value.trim();
-    if(!cloudName||!uploadPreset){showToast('❌ املأ الحقلين أولًا');return}
-    const s=loadSettings();
-    s.cloudName=cloudName;s.uploadPreset=uploadPreset;
-    saveSettings(s);
-    showToast('✅ تم الحفظ');
-}
+    return """// ═══════════════════════════════════════════════════════════
+// ☁️ إعدادات Cloudinary (جاهزة)
+// ═══════════════════════════════════════════════════════════
+const CLOUD_NAME='""" + CLOUD_NAME + """';
+const UPLOAD_PRESET='""" + UPLOAD_PRESET + """';
+const UPLOAD_URL=`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
 async function uploadImage(file){
-    if(!cloudName||!uploadPreset){showToast('⚙️ اضبط إعدادات Cloudinary أولًا');toggleSettings();return null}
-    if(!file.type.startsWith('image/')){showToast('❌ ليس ملف صورة');return null}
-
+    if(!file.type.startsWith('image/')){
+        showToast('❌ ليس ملف صورة');
+        return null;
+    }
+    if(file.size>10485760){
+        showToast('⚠️ الصورة كبيرة (10MB)');
+    }
     const fd=new FormData();
     fd.append('file',file);
-    fd.append('upload_preset',uploadPreset);
-
+    fd.append('upload_preset',UPLOAD_PRESET);
     try{
         setProgress(5,'⏳ جاري الرفع...');
         const xhr=new XMLHttpRequest();
-        const url=`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
         return await new Promise((resolve,reject)=>{
             xhr.upload.onprogress=e=>{
-                if(e.lengthComputable)setProgress((e.loaded/e.total)*100,`⏳ ${Math.round((e.loaded/e.total)*100)}%`);
+                if(e.lengthComputable){
+                    const pct=Math.round((e.loaded/e.total)*100);
+                    setProgress(pct,`⏳ ${pct}%`);
+                }
             };
             xhr.onload=()=>{
                 try{
                     const data=JSON.parse(xhr.responseText);
                     if(xhr.status>=200&&xhr.status<300){
-                        setProgress(100,'✅ تم الرفع');
-                        setTimeout(()=>setProgress(0,'جاهز'),1200);
-                        resolve({url:data.secure_url,publicId:data.public_id,name:file.name,size:file.size,at:Date.now()});
+                        setProgress(100,'✅ تم الرفع بنجاح');
+                        setTimeout(()=>setProgress(0,'جاهز للرفع'),1500);
+                        resolve({
+                            url:data.secure_url,
+                            publicId:data.public_id,
+                            name:file.name,
+                            size:file.size,
+                            at:Date.now()
+                        });
                     }else{
-                        setProgress(0,'❌ فشل: '+((data.error&&data.error.message)||'خطأ'));
-                        reject(new Error((data.error&&data.error.message)||'upload failed'));
+                        const msg=(data.error&&data.error.message)||'خطأ';
+                        setProgress(0,'❌ '+msg);
+                        reject(new Error(msg));
                     }
-                }catch(err){setProgress(0,'❌ خطأ في الاستجابة');reject(err)}
+                }catch(err){
+                    setProgress(0,'❌ استجابة غير صالحة');
+                    reject(err);
+                }
             };
-            xhr.onerror=()=>{setProgress(0,'❌ خطأ شبكة');reject(new Error('network'))};
-            xhr.open('POST',url);
+            xhr.onerror=()=>{
+                setProgress(0,'❌ خطأ شبكة');
+                reject(new Error('network error'));
+            };
+            xhr.open('POST',UPLOAD_URL);
             xhr.send(fd);
         });
     }catch(e){
-        showToast('❌ '+e.message);
+        console.error('upload failed',e);
+        showToast('❌ فشل الرفع: '+e.message);
         return null;
     }
 }
@@ -369,11 +412,11 @@ function setProgress(pct,status){
 }"""
 
 # ═══════════════════════════════════════════════════════════
-# 🖼️ 7. gallery.js (إدارة المعرض)
+# 🖼️ 7. gallery.js
 # ═══════════════════════════════════════════════════════════
 
 def build_gallery_js():
-    return """let gallery=[],currentIndex=-1;
+    return """let gallery=[],currentIndex=-1,isUploading=false;
 
 function initGallery(){
     gallery=loadGallery();
@@ -382,9 +425,12 @@ function initGallery(){
 }
 
 async function handleFiles(input){
+    if(isUploading){showToast('⏳ انتظر انتهاء الرفع');return}
     const files=Array.from(input.files||[]);
     if(!files.length)return;
-    let ok=0;
+    isUploading=true;
+    document.getElementById('uploadBtn').disabled=true;
+    let ok=0,fail=0;
     for(const f of files){
         const res=await uploadImage(f);
         if(res){
@@ -393,19 +439,23 @@ async function handleFiles(input){
             renderGallery();
             ok++;
             if(loadSettings().autoCopy)copyLink(res.url);
-        }
+        }else fail++;
     }
+    isUploading=false;
+    document.getElementById('uploadBtn').disabled=false;
     input.value='';
     if(ok){
-        showToast(`✅ تم رفع ${ok} صورة`);
+        showToast(`✅ تم رفع ${ok} صورة${fail?` (${fail} فشلت)`:''}`);
         if(currentIndex<0)selectImage(0,false);
+    }else if(fail){
+        showToast(`❌ فشل رفع ${fail} صورة`);
     }
 }
 
 function renderGallery(){
     const c=document.getElementById('imageGallery');
     if(!gallery.length){
-        c.innerHTML='<div class="empty-playlist"><span>🖼️</span><p>ارفع أول صورة لك</p></div>';
+        c.innerHTML='<div class="empty-playlist"><span>🖼️</span><p>اضغط الزر الأزرق لرفع أول صورة</p></div>';
         return;
     }
     c.innerHTML=gallery.map((g,i)=>`
@@ -413,8 +463,8 @@ function renderGallery(){
             <img src="${g.url}" alt="${escapeHtml(g.name)}" loading="lazy">
             <div class="img-name">${escapeHtml(g.name)}</div>
             <div class="img-actions">
-                <button onclick="event.stopPropagation();copyLink('${g.url}')">🔗 نسخ</button>
-                <button onclick="event.stopPropagation();shareLink('${g.url}')">📤 مشاركة</button>
+                <button onclick="event.stopPropagation();copyLink('${g.url}')">🔗</button>
+                <button onclick="event.stopPropagation();shareLink('${g.url}')">📤</button>
                 <button class="danger" onclick="event.stopPropagation();removeImage(${i})">🗑️</button>
             </div>
         </div>
@@ -432,55 +482,93 @@ function selectImage(i,silent=true){
     if(silent)showToast('👁️ '+g.name);
 }
 
-function nextImage(){if(!gallery.length)return;selectImage((currentIndex+1)%gallery.length)}
-function prevImage(){if(!gallery.length)return;selectImage((currentIndex-1+gallery.length)%gallery.length)}
+function nextImage(){
+    if(!gallery.length)return;
+    selectImage((currentIndex+1)%gallery.length);
+}
+
+function prevImage(){
+    if(!gallery.length)return;
+    selectImage((currentIndex-1+gallery.length)%gallery.length);
+}
 
 function removeImage(i){
-    if(!confirm('حذف هذه الصورة من المعرض المحلي؟'))return;
+    if(!confirm('حذف هذه الصورة من المعرض؟'))return;
+    const removed=gallery[i];
     gallery.splice(i,1);
     saveGallery(gallery);
     if(currentIndex>=gallery.length)currentIndex=gallery.length-1;
     renderGallery();
     if(gallery.length)selectImage(currentIndex,false);
     else showPreview(null);
-    showToast('🗑️ تم الحذف');
+    showToast('🗑️ تم الحذف من المعرض');
+    // ملاحظة: الحذف من Cloudinary يحتاج Backend
 }
 
-function deleteCurrent(){if(currentIndex>=0)removeImage(currentIndex)}
-function clearGallery(){if(!confirm('مسح كل الصور من المعرض المحلي؟'))return;gallery=[];saveGallery([]);renderGallery();showPreview(null);showToast('🗑️ تم المسح')}
+function deleteCurrent(){
+    if(currentIndex>=0)removeImage(currentIndex);
+}
+
+function clearGallery(){
+    if(!confirm('مسح كل الصور من المعرض المحلي؟'))return;
+    gallery=[];
+    currentIndex=-1;
+    saveGallery([]);
+    renderGallery();
+    showPreview(null);
+    showToast('🗑️ تم مسح المعرض');
+}
 
 function copyLink(url){
-    navigator.clipboard.writeText(url).then(()=>showToast('📋 تم نسخ الرابط')).catch(()=>{
-        const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast('📋 تم النسخ');
-    });
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url)
+            .then(()=>showToast('📋 تم نسخ الرابط'))
+            .catch(fallbackCopy);
+    }else fallbackCopy();
+    function fallbackCopy(){
+        const ta=document.createElement('textarea');
+        ta.value=url;
+        ta.style.position='fixed';
+        ta.style.opacity='0';
+        document.body.appendChild(ta);
+        ta.select();
+        try{document.execCommand('copy');showToast('📋 تم النسخ')}
+        catch(e){showToast('❌ لم يتم النسخ')}
+        ta.remove();
+    }
 }
 
 function shareLink(url){
-    if(navigator.share){navigator.share({url,title:'Pixel Vault 2044'}).catch(()=>{})}
-    else copyLink(url);
+    if(navigator.share){
+        navigator.share({url:url,title:'Pixel Vault 2044'}).catch(()=>{});
+    }else{
+        copyLink(url);
+    }
 }
 
-function formatSize(b){return b>1048576?(b/1048576).toFixed(1)+' MB':(b/1024).toFixed(1)+' KB'}
-function formatDate(ts){const d=new Date(ts);return d.toLocaleDateString('ar')+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}"""
+function formatSize(b){
+    if(b>1048576)return (b/1048576).toFixed(1)+' MB';
+    return (b/1024).toFixed(1)+' KB';
+}
+
+function formatDate(ts){
+    const d=new Date(ts);
+    return d.toLocaleDateString('ar')+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}"""
 
 # ═══════════════════════════════════════════════════════════
 # ⚙️ 8. app.js
 # ═══════════════════════════════════════════════════════════
 
 def build_app_js():
-    return """function toggleSettings(){
-    const p=document.getElementById('settingsPanel');
-    p.style.display=p.style.display==='none'?'block':'none';
-    document.getElementById('btnSettings').classList.toggle('active',p.style.display==='block');
-    if(p.style.display==='block')document.getElementById('infoPanel').style.display='none';
-}
-
-function toggleInfo(){
+    return """function toggleInfo(){
     const p=document.getElementById('infoPanel');
     p.style.display=p.style.display==='none'?'block':'none';
     document.getElementById('btnInfo').classList.toggle('active',p.style.display==='block');
-    if(p.style.display==='block')document.getElementById('settingsPanel').style.display='none';
 }
 
 function toggleAutoCopy(){
@@ -499,11 +587,17 @@ function showToast(m){
     window._toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
 }
 
+// ─── التهيئة ───
 initParticles();
 initVisualizer();
 initGallery();
-loadCloudConfig();
-if(!loadSettings().cloudName){setTimeout(()=>{showToast('⚙️ اضبط إعدادات Cloudinary');toggleSettings()},700)}
+
+// استعادة حالة النسخ التلقائي
+const _s=loadSettings();
+if(_s.autoCopy)document.getElementById('autoCopyBtn').classList.add('active');
+
+console.log('%c🖼️ Pixel Vault 2044 Ready','color:#00ffcc;font-size:16px;font-weight:bold');
+console.log('%c☁️ Cloudinary: """ + CLOUD_NAME + """','color:#6366f1');
 """
 
 # ═══════════════════════════════════════════════════════════
@@ -511,10 +605,11 @@ if(!loadSettings().cloudName){setTimeout(()=>{showToast('⚙️ اضبط إعد�
 # ═══════════════════════════════════════════════════════════
 
 def main():
-    print("""
+    print(f"""
 ╔══════════════════════════════════════════════════════════╗
 ║  🖼️  PIXEL VAULT 2044 - CLOUD IMAGE VAULT  🖼️        ║
-║     Generator - 8 Files                                  ║
+║     Cloudinary: {CLOUD_NAME:<40}║
+║     Preset: {UPLOAD_PRESET:<45}║
 ╚══════════════════════════════════════════════════════════╝
     """)
     section("BUILDING PIXEL VAULT 2044")
@@ -530,16 +625,20 @@ def main():
 
     print(f"""
 {'='*60}
-  ✅ BUILD COMPLETE! - {TOTAL_LINES} خط
-  📁 8 ملفات
+  ✅ BUILD COMPLETE! - {TOTAL_LINES} سطر
+  📁 8 ملفات جاهزة
 
-  🖼️  معرض صور مع معاينة
-  ☁️  رفع سحابي عبر Cloudinary
-  🔗  توليد روابط + نسخ + مشاركة
-  💾  تخزين دائم محلي
+  ☁️  Cloudinary مضبوط: {CLOUD_NAME}
+  🔑  Upload Preset: {UPLOAD_PRESET}
 
-  🚀 للتشغيل:
-     افتح index.html في المتصفح
+  🚀 الخطوات:
+     1. شغّل السكربت: python3 script.py
+     2. ارفع الملفات الثمانية على GitHub
+     3. اشتغل Workflow الـ APK
+     4. حمّل APK وثبّته
+
+  ⚠️  تحقق مرة من Preset في Cloudinary:
+     Settings → Upload → Upload presets → يجب أن يكون Unsigned
 
   🖼️ PIXEL VAULT 2044 READY!
 {'='*60}
