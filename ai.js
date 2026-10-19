@@ -1,6 +1,11 @@
 // ═══════════════════════════════════════════════════════════
 // 🧠 AI Vision Module
+// 3 طرق:
+// 1. إرسال الرابط إلى Gemini (نسخ + فتح الموقع)
+// 2. إرسال الرابط إلى ChatGPT (نسخ + فتح الموقع)
+// 3. تحليل داخلي عبر Gemini API مباشرة
 // ═══════════════════════════════════════════════════════════
+
 let aiConfig = {geminiKey:'',lang:'ar'};
 let lastAIResult = '';
 
@@ -18,7 +23,6 @@ function toggleAISettings(){
     if(open){
         document.getElementById('infoPanel').style.display='none';
         document.getElementById('aiResultPanel').style.display='none';
-        document.getElementById('chatPanel').style.display='none';
     }
 }
 
@@ -28,56 +32,71 @@ function saveAISettings(){
         lang: document.getElementById('aiLang').value
     };
     saveAIConfig(aiConfig);
-    showToast('✅ تم حفظ الإعدادات');
+    showToast('✅ تم حفظ إعدادات AI');
     document.getElementById('aiSettingsPanel').style.display='none';
     document.getElementById('btnAI').classList.remove('active');
 }
 
 // ═══════════════════════════════════════════════════════════
-// 📤 مشاركة الصورة إلى تطبيق خارجي (Gemini / ChatGPT)
+// 📋 دالة مساعدة: نسخ الرابط + فتح الموقع
 // ═══════════════════════════════════════════════════════════
-async function shareImageToAI(siteName){
+async function copyAndOpen(url, siteName, siteUrl){
     if(currentIndex<0||!gallery[currentIndex]){
         showToast('⚠️ اختر صورة أولاً');
         return;
     }
-    const img = gallery[currentIndex];
-    showToast(`⏳ جاري تجهيز الصورة...`);
+    const imgUrl = gallery[currentIndex].url;
 
-    try {
-        const response = await fetch(img.url, { mode: 'cors' });
-        const blob = await response.blob();
-        const file = new File([blob], img.name || 'image.jpg', { type: blob.type });
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-                files: [file],
-                title: 'تحليل صورة',
-                text: 'قم بتحليل هذه الصورة'
-            });
-            showToast(`✅ اختر ${siteName} من القائمة`);
-        } else {
-            showToast('⚠️ جهازك لا يدعم المشاركة');
-        }
-    } catch (error) {
-        console.error('Share error:', error);
-        showToast('❌ فشل التجهيز');
+    // نسخ الرابط
+    try{
+        await navigator.clipboard.writeText(imgUrl);
+        showToast(`📋 تم نسخ الرابط! افتح ${siteName} والصقه`);
+    }catch(e){
+        const ta = document.createElement('textarea');
+        ta.value = imgUrl;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try{document.execCommand('copy');showToast(`📋 تم النسخ! افتح ${siteName}`)}
+        catch(err){showToast('❌ لم يتم النسخ')}
+        ta.remove();
     }
+
+    // فتح الموقع
+    setTimeout(()=>{
+        window.open(siteUrl, '_blank');
+    }, 600);
 }
 
-async function sendToGemini(){ await shareImageToAI('Gemini'); }
-async function sendToChatGPT(){ await shareImageToAI('ChatGPT'); }
+// ═══════════════════════════════════════════════════════════
+// 💬 إرسال إلى Gemini (نسخ + فتح)
+// ═══════════════════════════════════════════════════════════
+async function sendToGemini(){
+    await copyAndOpen(null, 'Gemini', 'https://gemini.google.com/app');
+}
 
 // ═══════════════════════════════════════════════════════════
-// 🧠 الوصف السريع (Quick Analyze)
+// 💬 إرسال إلى ChatGPT (نسخ + فتح)
+// ═══════════════════════════════════════════════════════════
+async function sendToChatGPT(){
+    await copyAndOpen(null, 'ChatGPT', 'https://chatgpt.com/');
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🧠 التحليل الداخلي عبر Gemini API
 // ═══════════════════════════════════════════════════════════
 function getPrompt(){
-    if(aiConfig.lang==='en') return 'Describe this image in detail.';
-    return 'صف هذه الصورة بالتفصيل: المحتوى، الألوان، المشاعر، وأي نص موجود.';
+    if(aiConfig.lang==='en'){
+        return 'Describe this image in detail: content, colors, mood, possible use, and any text. Be concise but complete.';
+    }
+    return 'صف هذه الصورة بالتفصيل: ماذا تحتوي، الألوان، المشاعر، الاستخدام المحتمل، وأي نص موجود. كن موجزًا لكن شاملًا.';
 }
 
-async function analyzeWithGemini(imageUrl, customPrompt=null){
-    if(!aiConfig.geminiKey) throw new Error('أدخل مفتاح Gemini أولاً (زر 🤖)');
+async function analyzeWithGemini(imageUrl){
+    if(!aiConfig.geminiKey){
+        throw new Error('أدخل مفتاح Gemini أولاً (زر 🤖)');
+    }
 
     const imgResp = await fetch(imageUrl, {mode:'cors'});
     if(!imgResp.ok) throw new Error('تعذر تحميل الصورة');
@@ -94,10 +113,11 @@ async function analyzeWithGemini(imageUrl, customPrompt=null){
     const body = {
         contents:[{
             parts:[
-                {text: customPrompt || getPrompt()},
+                {text:getPrompt()},
                 {inline_data:{mime_type:mime,data:base64}}
             ]
-        }]
+        }],
+        generationConfig:{temperature:0.4,maxOutputTokens:1024}
     };
 
     const res = await fetch(endpoint,{
@@ -107,24 +127,36 @@ async function analyzeWithGemini(imageUrl, customPrompt=null){
     });
     const data = await res.json().catch(()=>({}));
     if(!res.ok){
-        throw new Error((data.error&&data.error.message)||`HTTP ${res.status}`);
+        const msg = (data.error&&data.error.message)||`HTTP ${res.status}`;
+        throw new Error(msg);
     }
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if(!text) throw new Error('لم يتم استلام رد');
+    const text = data.candidates
+        && data.candidates[0]
+        && data.candidates[0].content
+        && data.candidates[0].content.parts
+        && data.candidates[0].content.parts[0]
+        && data.candidates[0].content.parts[0].text;
+    if(!text) throw new Error('لم يتم استلام رد من Gemini');
     return text;
 }
 
+// ═══════════════════════════════════════════════════════════
+// 🎯 تحليل الصورة الحالية داخل التطبيق
+// ═══════════════════════════════════════════════════════════
 async function analyzeCurrentImage(){
-    if(currentIndex<0||!gallery[currentIndex]){ showToast('⚠️ اختر صورة أولاً'); return; }
+    if(currentIndex<0||!gallery[currentIndex]){
+        showToast('⚠️ اختر صورة أولاً');
+        return;
+    }
     const img = gallery[currentIndex];
     const btn = document.getElementById('aiAnalyzeBtn');
     const panel = document.getElementById('aiResultPanel');
     const content = document.getElementById('aiResultContent');
 
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحليل...';
     panel.style.display='block';
-    content.innerHTML = '<p class="ai-placeholder">🧠 يقرأ الصورة...</p>';
+    content.innerHTML = '<p class="ai-placeholder">🧠 الذكاء الاصطناعي يقرأ الصورة...</p>';
     setProgress(20,'🧠 تحليل...');
 
     try{
@@ -132,16 +164,25 @@ async function analyzeCurrentImage(){
         lastAIResult = result;
         content.textContent = result;
         saveAIResult(img.publicId||img.url, result);
-        setProgress(100,'✅ تم');
+        setProgress(100,'✅ تم التحليل');
         setTimeout(()=>setProgress(0,'جاهز'),1500);
+        showToast('🧠 اكتمل التحليل');
     }catch(e){
+        console.error('AI error:',e);
         content.innerHTML = `<p class="ai-placeholder" style="color:#ff6688">❌ ${e.message}</p>`;
-        setProgress(0,'❌ فشل');
+        setProgress(0,'❌ فشل التحليل');
+        showToast('❌ '+e.message);
     }finally{
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-brain"></i> وصف سريع';
+        btn.innerHTML = '<i class="fas fa-brain"></i> حلّل داخل التطبيق';
     }
 }
 
-function closeAIResult(){ document.getElementById('aiResultPanel').style.display='none'; }
-function copyAIResult(){ if(lastAIResult)copyLink(lastAIResult); }
+function closeAIResult(){
+    document.getElementById('aiResultPanel').style.display='none';
+}
+
+function copyAIResult(){
+    if(!lastAIResult){showToast('⚠️ لا نتيجة للنسخ');return}
+    copyLink(lastAIResult);
+}
