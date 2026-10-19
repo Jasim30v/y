@@ -1,11 +1,6 @@
 // ═══════════════════════════════════════════════════════════
 // 🧠 AI Vision Module
-// 3 طرق:
-// 1. إرسال الرابط إلى Gemini (نسخ + فتح الموقع)
-// 2. إرسال الرابط إلى ChatGPT (نسخ + فتح الموقع)
-// 3. تحليل داخلي عبر Gemini API مباشرة
 // ═══════════════════════════════════════════════════════════
-
 let aiConfig = {geminiKey:'',lang:'ar'};
 let lastAIResult = '';
 
@@ -23,6 +18,7 @@ function toggleAISettings(){
     if(open){
         document.getElementById('infoPanel').style.display='none';
         document.getElementById('aiResultPanel').style.display='none';
+        document.getElementById('chatPanel').style.display='none';
     }
 }
 
@@ -32,71 +28,56 @@ function saveAISettings(){
         lang: document.getElementById('aiLang').value
     };
     saveAIConfig(aiConfig);
-    showToast('✅ تم حفظ إعدادات AI');
+    showToast('✅ تم حفظ الإعدادات');
     document.getElementById('aiSettingsPanel').style.display='none';
     document.getElementById('btnAI').classList.remove('active');
 }
 
 // ═══════════════════════════════════════════════════════════
-// 📋 دالة مساعدة: نسخ الرابط + فتح الموقع
+// 📤 مشاركة الصورة إلى تطبيق خارجي (Gemini / ChatGPT)
 // ═══════════════════════════════════════════════════════════
-async function copyAndOpen(url, siteName, siteUrl){
+async function shareImageToAI(siteName){
     if(currentIndex<0||!gallery[currentIndex]){
         showToast('⚠️ اختر صورة أولاً');
         return;
     }
-    const imgUrl = gallery[currentIndex].url;
+    const img = gallery[currentIndex];
+    showToast(`⏳ جاري تجهيز الصورة...`);
 
-    // نسخ الرابط
-    try{
-        await navigator.clipboard.writeText(imgUrl);
-        showToast(`📋 تم نسخ الرابط! افتح ${siteName} والصقه`);
-    }catch(e){
-        const ta = document.createElement('textarea');
-        ta.value = imgUrl;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        try{document.execCommand('copy');showToast(`📋 تم النسخ! افتح ${siteName}`)}
-        catch(err){showToast('❌ لم يتم النسخ')}
-        ta.remove();
+    try {
+        const response = await fetch(img.url, { mode: 'cors' });
+        const blob = await response.blob();
+        const file = new File([blob], img.name || 'image.jpg', { type: blob.type });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+                files: [file],
+                title: 'تحليل صورة',
+                text: 'قم بتحليل هذه الصورة'
+            });
+            showToast(`✅ اختر ${siteName} من القائمة`);
+        } else {
+            showToast('⚠️ جهازك لا يدعم المشاركة');
+        }
+    } catch (error) {
+        console.error('Share error:', error);
+        showToast('❌ فشل التجهيز');
     }
-
-    // فتح الموقع
-    setTimeout(()=>{
-        window.open(siteUrl, '_blank');
-    }, 600);
 }
 
-// ═══════════════════════════════════════════════════════════
-// 💬 إرسال إلى Gemini (نسخ + فتح)
-// ═══════════════════════════════════════════════════════════
-async function sendToGemini(){
-    await copyAndOpen(null, 'Gemini', 'https://gemini.google.com/app');
-}
+async function sendToGemini(){ await shareImageToAI('Gemini'); }
+async function sendToChatGPT(){ await shareImageToAI('ChatGPT'); }
 
 // ═══════════════════════════════════════════════════════════
-// 💬 إرسال إلى ChatGPT (نسخ + فتح)
-// ═══════════════════════════════════════════════════════════
-async function sendToChatGPT(){
-    await copyAndOpen(null, 'ChatGPT', 'https://chatgpt.com/');
-}
-
-// ═══════════════════════════════════════════════════════════
-// 🧠 التحليل الداخلي عبر Gemini API
+// 🧠 الوصف السريع (Quick Analyze)
 // ═══════════════════════════════════════════════════════════
 function getPrompt(){
-    if(aiConfig.lang==='en'){
-        return 'Describe this image in detail: content, colors, mood, possible use, and any text. Be concise but complete.';
-    }
-    return 'صف هذه الصورة بالتفصيل: ماذا تحتوي، الألوان، المشاعر، الاستخدام المحتمل، وأي نص موجود. كن موجزًا لكن شاملًا.';
+    if(aiConfig.lang==='en') return 'Describe this image in detail.';
+    return 'صف هذه الصورة بالتفصيل: المحتوى، الألوان، المشاعر، وأي نص موجود.';
 }
 
-async function analyzeWithGemini(imageUrl){
-    if(!aiConfig.geminiKey){
-        throw new Error('أدخل مفتاح Gemini أولاً (زر 🤖)');
-    }
+async function analyzeWithGemini(imageUrl, customPrompt=null){
+    if(!aiConfig.geminiKey) throw new Error('أدخل مفتاح Gemini أولاً (زر 🤖)');
 
     const imgResp = await fetch(imageUrl, {mode:'cors'});
     if(!imgResp.ok) throw new Error('تعذر تحميل الصورة');
@@ -113,11 +94,10 @@ async function analyzeWithGemini(imageUrl){
     const body = {
         contents:[{
             parts:[
-                {text:getPrompt()},
+                {text: customPrompt || getPrompt()},
                 {inline_data:{mime_type:mime,data:base64}}
             ]
-        }],
-        generationConfig:{temperature:0.4,maxOutputTokens:1024}
+        }]
     };
 
     const res = await fetch(endpoint,{
@@ -127,36 +107,24 @@ async function analyzeWithGemini(imageUrl){
     });
     const data = await res.json().catch(()=>({}));
     if(!res.ok){
-        const msg = (data.error&&data.error.message)||`HTTP ${res.status}`;
-        throw new Error(msg);
+        throw new Error((data.error&&data.error.message)||`HTTP ${res.status}`);
     }
-    const text = data.candidates
-        && data.candidates[0]
-        && data.candidates[0].content
-        && data.candidates[0].content.parts
-        && data.candidates[0].content.parts[0]
-        && data.candidates[0].content.parts[0].text;
-    if(!text) throw new Error('لم يتم استلام رد من Gemini');
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(!text) throw new Error('لم يتم استلام رد');
     return text;
 }
 
-// ═══════════════════════════════════════════════════════════
-// 🎯 تحليل الصورة الحالية داخل التطبيق
-// ═══════════════════════════════════════════════════════════
 async function analyzeCurrentImage(){
-    if(currentIndex<0||!gallery[currentIndex]){
-        showToast('⚠️ اختر صورة أولاً');
-        return;
-    }
+    if(currentIndex<0||!gallery[currentIndex]){ showToast('⚠️ اختر صورة أولاً'); return; }
     const img = gallery[currentIndex];
     const btn = document.getElementById('aiAnalyzeBtn');
     const panel = document.getElementById('aiResultPanel');
     const content = document.getElementById('aiResultContent');
 
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحليل...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
     panel.style.display='block';
-    content.innerHTML = '<p class="ai-placeholder">🧠 الذكاء الاصطناعي يقرأ الصورة...</p>';
+    content.innerHTML = '<p class="ai-placeholder">🧠 يقرأ الصورة...</p>';
     setProgress(20,'🧠 تحليل...');
 
     try{
@@ -164,25 +132,16 @@ async function analyzeCurrentImage(){
         lastAIResult = result;
         content.textContent = result;
         saveAIResult(img.publicId||img.url, result);
-        setProgress(100,'✅ تم التحليل');
+        setProgress(100,'✅ تم');
         setTimeout(()=>setProgress(0,'جاهز'),1500);
-        showToast('🧠 اكتمل التحليل');
     }catch(e){
-        console.error('AI error:',e);
         content.innerHTML = `<p class="ai-placeholder" style="color:#ff6688">❌ ${e.message}</p>`;
-        setProgress(0,'❌ فشل التحليل');
-        showToast('❌ '+e.message);
+        setProgress(0,'❌ فشل');
     }finally{
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-brain"></i> حلّل داخل التطبيق';
+        btn.innerHTML = '<i class="fas fa-brain"></i> وصف سريع';
     }
 }
 
-function closeAIResult(){
-    document.getElementById('aiResultPanel').style.display='none';
-}
-
-function copyAIResult(){
-    if(!lastAIResult){showToast('⚠️ لا نتيجة للنسخ');return}
-    copyLink(lastAIResult);
-}
+function closeAIResult(){ document.getElementById('aiResultPanel').style.display='none'; }
+function copyAIResult(){ if(lastAIResult)copyLink(lastAIResult); }
