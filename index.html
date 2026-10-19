@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🖼️ Pixel Vault 2044</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-void"></div>
+    <div class="bg-ring bg-ring-1"></div>
+    <div class="bg-ring bg-ring-2"></div>
+    <div class="bg-ring bg-ring-3"></div>
+    <div id="particlesContainer"></div>
+
+    <div class="app">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">🖼️</div>
+                <div class="header-text">
+                    <h1>Pixel Vault</h1>
+                    <span>✦ Cloud Image Vault ✦</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-icon" onclick="toggleSettings()" id="btnSettings"><i class="fas fa-cog"></i></button>
+                <button class="btn-icon" onclick="toggleInfo()" id="btnInfo"><i class="fas fa-circle-info"></i></button>
+            </div>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="visualizer-3d" id="visualizer3D">
+            <canvas id="vizCanvas"></canvas>
+            <div class="viz-overlay">
+                <div class="track-info">
+                    <div class="track-title" id="trackTitle">اختر صورة</div>
+                    <div class="track-artist" id="trackArtist">Pixel Vault 2044</div>
+                </div>
+                <div class="track-time">
+                    <span id="currentTime">—</span>
+                    <span id="totalTime">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress / Upload bar -->
+        <div class="progress-section">
+            <div class="progress-track" id="progressTrack">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-status" id="progressStatus">جاهز</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn"><i class="fas fa-copy"></i></button>
+            <button class="ctrl-btn" onclick="prevImage()"><i class="fas fa-backward-step"></i></button>
+            <button class="ctrl-play" id="uploadBtn" onclick="document.getElementById('imageInput').click()"><i class="fas fa-cloud-arrow-up" id="playIcon"></i></button>
+            <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this)">
+            <button class="ctrl-btn" onclick="nextImage()"><i class="fas fa-forward-step"></i></button>
+            <button class="ctrl-btn" onclick="deleteCurrent()" id="deleteBtn"><i class="fas fa-trash"></i></button>
+        </div>
+
+        <!-- Settings Panel (Cloudinary) -->
+        <div class="eq-panel" id="settingsPanel" style="display:none">
+            <div class="eq-header">
+                <h3>⚙️ إعدادات الرفع السحابي</h3>
+            </div>
+            <div class="settings-body">
+                <label class="settings-label">Cloud Name</label>
+                <input type="text" class="settings-input" id="cloudNameInput" placeholder="مثال: mycloud123">
+                <label class="settings-label">Upload Preset (Unsigned)</label>
+                <input type="text" class="settings-input" id="uploadPresetInput" placeholder="مثال: sonic_unsigned">
+                <button class="btn-action wide" onclick="saveCloudSettings()">💾 حفظ الإعدادات</button>
+                <p class="settings-hint">احصل على هذه القيم من cloudinary.com → Settings → Upload → Add upload preset (Unsigned).</p>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="lyrics-panel" id="infoPanel" style="display:none">
+            <div class="lyrics-header">
+                <h3>ℹ️ عن التطبيق</h3>
+            </div>
+            <div class="lyrics-content">
+                <p class="lyrics-line">📤 ارفع صورك إلى السحابة بضغطة</p>
+                <p class="lyrics-line">🔗 كل صورة تحصل على رابط مباشر</p>
+                <p class="lyrics-line">📋 انسخ أو شارك أو احذف</p>
+                <p class="lyrics-line">💾 معرضك محفوظ محليًا</p>
+            </div>
+        </div>
+
+        <!-- Gallery -->
+        <div class="playlist-section">
+            <div class="playlist-header">
+                <h3>🖼️ معرض الصور</h3>
+                <button class="btn-action" onclick="clearGallery()">🗑️ مسح الكل</button>
+            </div>
+            <div class="playlist image-gallery" id="imageGallery">
+                <div class="empty-playlist">
+                    <span>🖼️</span>
+                    <p>ارفع أول صورة لك</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="storage.js"></script>
+    <script src="particles.js"></script>
+    <script src="visualizer.js"></script>
+    <script src="uploader.js"></script>
+    <script src="gallery.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
