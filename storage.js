@@ -9,8 +9,7 @@ function saveSettings(s){return saveData(KEYS.settings,s)}
 function loadSettings(){return loadData(KEYS.settings,{autoCopy:false})}
 
 function saveAIConfig(c){return saveData(KEYS.ai,c)}
-// ✅ القيمة الافتراضية للموديل أصبحت gemini-2.5-flash
-function loadAIConfig(){return loadData(KEYS.ai,{geminiKey:'',geminiModel:'gemini-2.5-flash',lang:'ar'})}
+function loadAIConfig(){return loadData(KEYS.ai,{geminiKey:'',lang:'ar'})}
 
 function saveAIResult(imageId,result){
     const all=loadData(KEYS.results,{});
