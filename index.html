@@ -26,7 +26,6 @@
                 </div>
             </div>
             <div class="header-right">
-                <button class="btn-icon" onclick="toggleSettings()" id="btnSettings"><i class="fas fa-cog"></i></button>
                 <button class="btn-icon" onclick="toggleInfo()" id="btnInfo"><i class="fas fa-circle-info"></i></button>
             </div>
         </div>
@@ -34,6 +33,7 @@
         <!-- Image Preview -->
         <div class="visualizer-3d" id="visualizer3D">
             <canvas id="vizCanvas"></canvas>
+            <img class="preview-img" id="previewImg" alt="">
             <div class="viz-overlay">
                 <div class="track-info">
                     <div class="track-title" id="trackTitle">اختر صورة</div>
@@ -48,35 +48,20 @@
 
         <!-- Progress / Upload bar -->
         <div class="progress-section">
-            <div class="progress-track" id="progressTrack">
+            <div class="progress-track">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="progress-status" id="progressStatus">جاهز</div>
+            <div class="progress-status" id="progressStatus">جاهز للرفع</div>
         </div>
 
         <!-- Controls -->
         <div class="controls">
-            <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn"><i class="fas fa-copy"></i></button>
+            <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn" title="نسخ تلقائي"><i class="fas fa-copy"></i></button>
             <button class="ctrl-btn" onclick="prevImage()"><i class="fas fa-backward-step"></i></button>
-            <button class="ctrl-play" id="uploadBtn" onclick="document.getElementById('imageInput').click()"><i class="fas fa-cloud-arrow-up" id="playIcon"></i></button>
+            <button class="ctrl-play" id="uploadBtn" onclick="document.getElementById('imageInput').click()"><i class="fas fa-cloud-arrow-up"></i></button>
             <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this)">
             <button class="ctrl-btn" onclick="nextImage()"><i class="fas fa-forward-step"></i></button>
-            <button class="ctrl-btn" onclick="deleteCurrent()" id="deleteBtn"><i class="fas fa-trash"></i></button>
-        </div>
-
-        <!-- Settings Panel (Cloudinary) -->
-        <div class="eq-panel" id="settingsPanel" style="display:none">
-            <div class="eq-header">
-                <h3>⚙️ إعدادات الرفع السحابي</h3>
-            </div>
-            <div class="settings-body">
-                <label class="settings-label">Cloud Name</label>
-                <input type="text" class="settings-input" id="cloudNameInput" placeholder="مثال: mycloud123">
-                <label class="settings-label">Upload Preset (Unsigned)</label>
-                <input type="text" class="settings-input" id="uploadPresetInput" placeholder="مثال: sonic_unsigned">
-                <button class="btn-action wide" onclick="saveCloudSettings()">💾 حفظ الإعدادات</button>
-                <p class="settings-hint">احصل على هذه القيم من cloudinary.com → Settings → Upload → Add upload preset (Unsigned).</p>
-            </div>
+            <button class="ctrl-btn" onclick="deleteCurrent()" title="حذف"><i class="fas fa-trash"></i></button>
         </div>
 
         <!-- Info Panel -->
@@ -89,6 +74,7 @@
                 <p class="lyrics-line">🔗 كل صورة تحصل على رابط مباشر</p>
                 <p class="lyrics-line">📋 انسخ أو شارك أو احذف</p>
                 <p class="lyrics-line">💾 معرضك محفوظ محليًا</p>
+                <p class="lyrics-line">☁️ مضبوط مسبقًا على حسابك</p>
             </div>
         </div>
 
@@ -101,7 +87,7 @@
             <div class="playlist image-gallery" id="imageGallery">
                 <div class="empty-playlist">
                     <span>🖼️</span>
-                    <p>ارفع أول صورة لك</p>
+                    <p>اضغط الزر الأزرق لرفع أول صورة</p>
                 </div>
             </div>
         </div>

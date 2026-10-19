@@ -1,15 +1,7 @@
-function toggleSettings(){
-    const p=document.getElementById('settingsPanel');
-    p.style.display=p.style.display==='none'?'block':'none';
-    document.getElementById('btnSettings').classList.toggle('active',p.style.display==='block');
-    if(p.style.display==='block')document.getElementById('infoPanel').style.display='none';
-}
-
 function toggleInfo(){
     const p=document.getElementById('infoPanel');
     p.style.display=p.style.display==='none'?'block':'none';
     document.getElementById('btnInfo').classList.toggle('active',p.style.display==='block');
-    if(p.style.display==='block')document.getElementById('settingsPanel').style.display='none';
 }
 
 function toggleAutoCopy(){
@@ -28,8 +20,14 @@ function showToast(m){
     window._toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
 }
 
+// ─── التهيئة ───
 initParticles();
 initVisualizer();
 initGallery();
-loadCloudConfig();
-if(!loadSettings().cloudName){setTimeout(()=>{showToast('⚙️ اضبط إعدادات Cloudinary');toggleSettings()},700)}
+
+// استعادة حالة النسخ التلقائي
+const _s=loadSettings();
+if(_s.autoCopy)document.getElementById('autoCopyBtn').classList.add('active');
+
+console.log('%c🖼️ Pixel Vault 2044 Ready','color:#00ffcc;font-size:16px;font-weight:bold');
+console.log('%c☁️ Cloudinary: dhu9l0lfs','color:#6366f1');

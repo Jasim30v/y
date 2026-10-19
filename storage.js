@@ -6,4 +6,4 @@ function saveGallery(g){return saveData(KEYS.gallery,g)}
 function loadGallery(){return loadData(KEYS.gallery,[])}
 
 function saveSettings(s){return saveData(KEYS.settings,s)}
-function loadSettings(){return loadData(KEYS.settings,{cloudName:'',uploadPreset:'',autoCopy:false})}
+function loadSettings(){return loadData(KEYS.settings,{autoCopy:false})}
