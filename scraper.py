@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
 ╔══════════════════════════════════════════════════════════════╗
-║  🧠  PIXEL VAULT 2044 - FLEXIBLE MODEL BUILD  🧠         ║
+║  🧠  PIXEL VAULT 2044 - CHAT & VISION BUILD  🧠          ║
 ║                                                            ║
 ║  ☁️  Cloudinary: dhu9l0lfs                                 ║
 ║  🔑 Upload Preset: go_fk3                                  ║
-║  ⚙️  Model: قابل للتعديل من داخل التطبيق                    ║
+║  💬 Chat + AI Analysis + Share                             ║
 ║                                                            ║
 ╚══════════════════════════════════════════════════════════════╝
 """
@@ -58,6 +58,7 @@ def build_index():
     <div id="particlesContainer"></div>
 
     <div class="app">
+        <!-- Header -->
         <div class="header">
             <div class="header-left">
                 <div class="logo">🧠</div>
@@ -72,6 +73,7 @@ def build_index():
             </div>
         </div>
 
+        <!-- Image Preview -->
         <div class="visualizer-3d" id="visualizer3D">
             <canvas id="vizCanvas"></canvas>
             <img class="preview-img" id="previewImg" alt="">
@@ -87,6 +89,7 @@ def build_index():
             </div>
         </div>
 
+        <!-- Progress -->
         <div class="progress-section">
             <div class="progress-track">
                 <div class="progress-fill" id="progressFill"></div>
@@ -94,6 +97,7 @@ def build_index():
             <div class="progress-status" id="progressStatus">جاهز</div>
         </div>
 
+        <!-- Controls -->
         <div class="controls">
             <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn" title="نسخ تلقائي"><i class="fas fa-copy"></i></button>
             <button class="ctrl-btn" onclick="prevImage()"><i class="fas fa-backward-step"></i></button>
@@ -103,6 +107,7 @@ def build_index():
             <button class="ctrl-btn" onclick="deleteCurrent()" title="حذف"><i class="fas fa-trash"></i></button>
         </div>
 
+        <!-- AI Action Bar -->
         <div class="ai-action-bar">
             <button class="ai-btn gemini-btn" onclick="openChat()">
                 <i class="fas fa-comments"></i> دردشة Gemini
@@ -120,20 +125,15 @@ def build_index():
             </button>
         </div>
 
-        <!-- AI Settings Panel (مُعدّل) -->
+        <!-- AI Settings Panel -->
         <div class="lyrics-panel" id="aiSettingsPanel" style="display:none">
             <div class="lyrics-header">
                 <h3>🧠 إعدادات الذكاء الاصطناعي</h3>
             </div>
             <div class="lyrics-content">
-                <p class="ai-label">مفتاح Gemini API:</p>
+                <p class="ai-label">مفتاح Gemini API (للتحليل والدردشة):</p>
                 <input type="password" class="ai-input" id="geminiKey" placeholder="AIza...">
                 <p class="ai-hint">🔗 احصل عليه من: https://aistudio.google.com/apikey</p>
-
-                <!-- ✅ حقل جديد: اسم الموديل -->
-                <p class="ai-label">اسم الموديل (Model):</p>
-                <input type="text" class="ai-input" id="geminiModel" placeholder="gemini-2.5-flash">
-                <p class="ai-hint">💡 إذا فشل الموديل، جرّب: gemini-2.5-flash-lite أو gemini-flash-latest</p>
 
                 <p class="ai-label">لغة الردود:</p>
                 <select class="ai-select" id="aiLang">
@@ -145,18 +145,22 @@ def build_index():
             </div>
         </div>
 
+        <!-- Chat Panel -->
         <div class="lyrics-panel chat-panel" id="chatPanel" style="display:none">
             <div class="lyrics-header">
                 <h3><i class="fas fa-comments"></i> دردشة Gemini</h3>
                 <button class="btn-action small" onclick="closeChat()">✕</button>
             </div>
-            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-messages" id="chatMessages">
+                <!-- الرسائل تظهر هنا -->
+            </div>
             <div class="chat-input-row">
                 <input type="text" id="chatInput" class="ai-input" placeholder="اسأل عن الصورة..." onkeypress="if(event.key==='Enter')sendChatMessage()">
                 <button class="btn-send" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
 
+        <!-- AI Result Panel (للوصف السريع) -->
         <div class="ai-result-panel" id="aiResultPanel" style="display:none">
             <div class="ai-result-header">
                 <h3><i class="fas fa-brain"></i> نتيجة الوصف</h3>
@@ -171,6 +175,7 @@ def build_index():
             </div>
         </div>
 
+        <!-- Info Panel -->
         <div class="lyrics-panel" id="infoPanel" style="display:none">
             <div class="lyrics-header">
                 <h3>ℹ️ عن التطبيق</h3>
@@ -184,6 +189,7 @@ def build_index():
             </div>
         </div>
 
+        <!-- Gallery -->
         <div class="playlist-section">
             <div class="playlist-header">
                 <h3>🖼️ معرض الصور</h3>
@@ -264,6 +270,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .ctrl-play:active{transform:scale(0.95)}
 .ctrl-play:disabled{opacity:0.5;cursor:not-allowed;transform:none}
 
+/* AI Action Bar */
 .ai-action-bar{display:flex;gap:8px;justify-content:center;margin-bottom:10px;flex-wrap:wrap}
 .ai-btn{flex:1;min-width:130px;padding:12px 16px;border:none;border-radius:25px;color:#fff;font-size:12px;font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px}
 .ai-btn:hover{transform:translateY(-2px)}
@@ -273,11 +280,14 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 
 .gemini-btn{background:linear-gradient(135deg,#6366f1,#4f46e5);box-shadow:0 6px 20px rgba(99,102,241,0.4)}
 .gemini-btn:hover{box-shadow:0 10px 30px rgba(99,102,241,0.6)}
+
 .chatgpt-btn{background:linear-gradient(135deg,#10a37f,#0d8c6d);box-shadow:0 6px 20px rgba(16,163,127,0.4)}
 .chatgpt-btn:hover{box-shadow:0 10px 30px rgba(16,163,127,0.6)}
+
 .analyze-btn{background:linear-gradient(135deg,#ff44aa,#ff6b9d);box-shadow:0 6px 20px rgba(255,68,170,0.4)}
 .analyze-btn:hover{box-shadow:0 10px 30px rgba(255,68,170,0.6)}
 
+/* Chat Panel */
 .chat-panel{display:flex;flex-direction:column;max-height:400px}
 .chat-messages{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:8px 0;margin-bottom:8px;max-height:250px}
 .chat-msg{padding:10px 14px;border-radius:16px;font-size:12px;line-height:1.6;max-width:85%;word-wrap:break-word;white-space:pre-wrap}
@@ -289,6 +299,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-send:hover{transform:scale(1.05)}
 .btn-send:active{transform:scale(0.95)}
 
+/* Panels */
 .lyrics-panel,.ai-result-panel{background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;animation:slideDown 0.4s ease}
 @keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:600px}}
 .lyrics-header,.ai-result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
@@ -348,8 +359,7 @@ function saveSettings(s){return saveData(KEYS.settings,s)}
 function loadSettings(){return loadData(KEYS.settings,{autoCopy:false})}
 
 function saveAIConfig(c){return saveData(KEYS.ai,c)}
-// ✅ القيمة الافتراضية للموديل أصبحت gemini-2.5-flash
-function loadAIConfig(){return loadData(KEYS.ai,{geminiKey:'',geminiModel:'gemini-2.5-flash',lang:'ar'})}
+function loadAIConfig(){return loadData(KEYS.ai,{geminiKey:'',lang:'ar'})}
 
 function saveAIResult(imageId,result){
     const all=loadData(KEYS.results,{});
@@ -654,20 +664,19 @@ function formatDate(ts){const d=new Date(ts);return d.toLocaleDateString('ar')+'
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}"""
 
 # ═══════════════════════════════════════════════════════════
-# 🧠 8. ai.js (مُعدّل لاستخدام الموديل القابل للتغيير)
+# 🧠 8. ai.js
 # ═══════════════════════════════════════════════════════════
 
 def build_ai_js():
     return """// ═══════════════════════════════════════════════════════════
-// 🧠 AI Vision Module - Flexible Model
+// 🧠 AI Vision Module
 // ═══════════════════════════════════════════════════════════
-let aiConfig = {geminiKey:'',geminiModel:'gemini-2.5-flash',lang:'ar'};
+let aiConfig = {geminiKey:'',lang:'ar'};
 let lastAIResult = '';
 
 function initAI(){
     aiConfig = loadAIConfig();
     document.getElementById('geminiKey').value = aiConfig.geminiKey||'';
-    document.getElementById('geminiModel').value = aiConfig.geminiModel||'gemini-2.5-flash';
     document.getElementById('aiLang').value = aiConfig.lang||'ar';
 }
 
@@ -686,17 +695,16 @@ function toggleAISettings(){
 function saveAISettings(){
     aiConfig = {
         geminiKey: document.getElementById('geminiKey').value.trim(),
-        geminiModel: document.getElementById('geminiModel').value.trim() || 'gemini-2.5-flash',
         lang: document.getElementById('aiLang').value
     };
     saveAIConfig(aiConfig);
-    showToast('✅ تم الحفظ');
+    showToast('✅ تم حفظ الإعدادات');
     document.getElementById('aiSettingsPanel').style.display='none';
     document.getElementById('btnAI').classList.remove('active');
 }
 
 // ═══════════════════════════════════════════════════════════
-// 📤 مشاركة الصورة
+// 📤 مشاركة الصورة إلى تطبيق خارجي (Gemini / ChatGPT)
 // ═══════════════════════════════════════════════════════════
 async function shareImageToAI(siteName){
     if(currentIndex<0||!gallery[currentIndex]){
@@ -704,13 +712,19 @@ async function shareImageToAI(siteName){
         return;
     }
     const img = gallery[currentIndex];
-    showToast('⏳ جاري تجهيز الصورة...');
+    showToast(`⏳ جاري تجهيز الصورة...`);
+
     try {
         const response = await fetch(img.url, { mode: 'cors' });
         const blob = await response.blob();
         const file = new File([blob], img.name || 'image.jpg', { type: blob.type });
+
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: 'تحليل صورة', text: 'قم بتحليل هذه الصورة' });
+            await navigator.share({
+                files: [file],
+                title: 'تحليل صورة',
+                text: 'قم بتحليل هذه الصورة'
+            });
             showToast(`✅ اختر ${siteName} من القائمة`);
         } else {
             showToast('⚠️ جهازك لا يدعم المشاركة');
@@ -725,7 +739,7 @@ async function sendToGemini(){ await shareImageToAI('Gemini'); }
 async function sendToChatGPT(){ await shareImageToAI('ChatGPT'); }
 
 // ═══════════════════════════════════════════════════════════
-// 🧠 الوصف السريع
+// 🧠 الوصف السريع (Quick Analyze)
 // ═══════════════════════════════════════════════════════════
 function getPrompt(){
     if(aiConfig.lang==='en') return 'Describe this image in detail.';
@@ -733,7 +747,7 @@ function getPrompt(){
 }
 
 async function analyzeWithGemini(imageUrl, customPrompt=null){
-    if(!aiConfig.geminiKey) throw new Error('أدخل مفتاح Gemini أولاً');
+    if(!aiConfig.geminiKey) throw new Error('أدخل مفتاح Gemini أولاً (زر 🤖)');
 
     const imgResp = await fetch(imageUrl, {mode:'cors'});
     if(!imgResp.ok) throw new Error('تعذر تحميل الصورة');
@@ -746,9 +760,7 @@ async function analyzeWithGemini(imageUrl, customPrompt=null){
     });
     const mime = blob.type || 'image/jpeg';
 
-    // ✅ استخدام الموديل من الإعدادات
-    const model = aiConfig.geminiModel || 'gemini-2.5-flash';
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${aiConfig.geminiKey}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${aiConfig.geminiKey}`;
     const body = {
         contents:[{
             parts:[
@@ -805,20 +817,27 @@ function closeAIResult(){ document.getElementById('aiResultPanel').style.display
 function copyAIResult(){ if(lastAIResult)copyLink(lastAIResult); }"""
 
 # ═══════════════════════════════════════════════════════════
-# 💬 9. chat.js (مُعدّل لاستخدام الموديل القابل للتغيير)
+# 💬 9. chat.js (ملف الدردشة الجديد)
 # ═══════════════════════════════════════════════════════════
 
 def build_chat_js():
     return """// ═══════════════════════════════════════════════════════════
-// 💬 Chat Module - Flexible Model
+// 💬 Chat Module - دردشة تفاعلية مع Gemini حول الصورة
 // ═══════════════════════════════════════════════════════════
 let chatHistory = [];
 let chatImageBase64 = null;
 let chatImageMime = null;
 
 function openChat(){
-    if(currentIndex<0||!gallery[currentIndex]){ showToast('⚠️ اختر صورة أولاً'); return; }
-    if(!aiConfig.geminiKey){ showToast('⚠️ أدخل مفتاح Gemini أولاً'); toggleAISettings(); return; }
+    if(currentIndex<0||!gallery[currentIndex]){
+        showToast('⚠️ اختر صورة أولاً');
+        return;
+    }
+    if(!aiConfig.geminiKey){
+        showToast('⚠️ أدخل مفتاح Gemini أولاً');
+        toggleAISettings();
+        return;
+    }
     document.getElementById('chatPanel').style.display='flex';
     document.getElementById('aiResultPanel').style.display='none';
     document.getElementById('aiSettingsPanel').style.display='none';
@@ -826,13 +845,16 @@ function openChat(){
     resetChat();
 }
 
-function closeChat(){ document.getElementById('chatPanel').style.display='none'; }
+function closeChat(){
+    document.getElementById('chatPanel').style.display='none';
+}
 
 async function resetChat(){
     chatHistory = [];
     const img = gallery[currentIndex];
     const container = document.getElementById('chatMessages');
     container.innerHTML = '<div class="chat-msg ai-msg">⏳ جاري قراءة الصورة...</div>';
+    
     try{
         const resp = await fetch(img.url, {mode:'cors'});
         const blob = await resp.blob();
@@ -844,7 +866,7 @@ async function resetChat(){
             r.readAsDataURL(blob);
         });
         container.innerHTML = '';
-        addChatMessage('ai', '✅ تم تحميل الصورة! اسألني أي شيء عنها.');
+        addChatMessage('ai', '✅ تم تحميل الصورة! اسألني أي شيء عنها.\\n(مثال: ماذا يوجد فيها؟ / اقرأ النص / صف الألوان)');
     }catch(e){
         container.innerHTML = '';
         addChatMessage('ai', '❌ فشل تحميل الصورة: '+e.message);
@@ -865,17 +887,22 @@ async function sendChatMessage(){
     const input = document.getElementById('chatInput');
     const msg = input.value.trim();
     if(!msg) return;
-    if(!chatImageBase64){ showToast('⏳ انتظر تحميل الصورة'); return; }
+    if(!chatImageBase64){
+        showToast('⏳ انتظر تحميل الصورة');
+        return;
+    }
 
     addChatMessage('user', msg);
     input.value = '';
+    
     const typingEl = addChatMessage('ai', '...');
     typingEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> يفكر...';
 
+    // إضافة سؤال المستخدم للتاريخ
+    chatHistory.push({role:'user', text:msg});
+
     try{
-        // ✅ استخدام الموديل من الإعدادات
-        const model = aiConfig.geminiModel || 'gemini-2.5-flash';
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${aiConfig.geminiKey}`;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${aiConfig.geminiKey}`;
         const body = {
             contents: [{
                 parts: [
@@ -898,6 +925,7 @@ async function sendChatMessage(){
 
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'لم يتم استلام رد.';
         typingEl.textContent = reply;
+        chatHistory.push({role:'ai', text:reply});
     }catch(e){
         typingEl.textContent = '❌ خطأ: '+e.message;
     }
@@ -954,12 +982,12 @@ window.addEventListener('DOMContentLoaded',()=>{
 def main():
     print(f"""
 ╔══════════════════════════════════════════════════════════╗
-║  🧠  PIXEL VAULT 2044 - FLEXIBLE MODEL BUILD  🧠        ║
+║  🧠  PIXEL VAULT 2044 - CHAT BUILD  🧠                  ║
 ║     Cloudinary: {CLOUD_NAME:<40}║
 ║     Preset: {UPLOAD_PRESET:<45}║
 ╚══════════════════════════════════════════════════════════╝
     """)
-    section("BUILDING PIXEL VAULT + FLEXIBLE MODEL")
+    section("BUILDING PIXEL VAULT + CHAT")
 
     write("index.html", build_index())
     write("style.css", build_style())
@@ -977,23 +1005,19 @@ def main():
   ✅ BUILD COMPLETE! - {TOTAL_LINES} سطر
   📁 10 ملفات جاهزة
 
-  🔧 التعديلات الجديدة:
-     ✅ حقل "اسم الموديل" في الإعدادات
-     ✅ القيمة الافتراضية: gemini-2.5-flash
-     ✅ يمكنك تغييره لأي موديل آخر مستقبلاً
-     ✅ لا حاجة لتعديل الكود مرة أخرى
+  ✨ الميزات الجديدة:
+     💬 دردشة كاملة مع Gemini
+     🧠 وصف سريع للصورة
+     📤 مشاركة الصورة إلى Gemini/ChatGPT
+     💾 حفظ نتائج التحليل
+     📋 نسخ النتائج
 
   🚀 الخطوات:
      1. شغّل السكربت
      2. انسخ الملفات إلى www/
      3. ارفع على GitHub → APK
-     4. ثبّت → اضغط 🤖 → أدخل المفتاح + الموديل
-     5. ارفع صورة → دردشة!
-
-  💡 إذا فشل الموديل، جرّب:
-     - gemini-2.5-flash-lite
-     - gemini-flash-latest
-     - gemini-2.0-flash
+     4. ثبّت → اضغط 🤖 → أدخل مفتاح Gemini
+     5. ارفع صورة → اضغط "دردشة Gemini" → اسأل!
 
   🧠 READY!
 {'='*60}
