@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
 ╔══════════════════════════════════════════════════════════════╗
-║  🧠  PIXEL VAULT 2044 - FULL AI BUILD  🧠                 ║
+║  🧠  PIXEL VAULT 2044 - CHAT & VISION BUILD  🧠          ║
 ║                                                            ║
 ║  ☁️  Cloudinary: dhu9l0lfs                                 ║
 ║  🔑 Upload Preset: go_fk3                                  ║
-║  🧠 AI: Gemini + ChatGPT + تحليل مباشر                     ║
+║  💬 Chat + AI Analysis + Share                             ║
 ║                                                            ║
 ╚══════════════════════════════════════════════════════════════╝
 """
@@ -45,7 +45,7 @@ def build_index():
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; img-src * data: blob:; connect-src *;">
-    <title>🧠 Pixel Vault 2044 + AI</title>
+    <title>🧠 Pixel Vault Chat</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -64,7 +64,7 @@ def build_index():
                 <div class="logo">🧠</div>
                 <div class="header-text">
                     <h1>Pixel Vault AI</h1>
-                    <span>✦ Vision Enabled ✦</span>
+                    <span>✦ Chat + Vision ✦</span>
                 </div>
             </div>
             <div class="header-right">
@@ -109,17 +109,19 @@ def build_index():
 
         <!-- AI Action Bar -->
         <div class="ai-action-bar">
-            <button class="ai-btn gemini-btn" onclick="sendToGemini()">
-                <i class="fas fa-comment-dots"></i> أرسل إلى Gemini
+            <button class="ai-btn gemini-btn" onclick="openChat()">
+                <i class="fas fa-comments"></i> دردشة Gemini
             </button>
-            <button class="ai-btn chatgpt-btn" onclick="sendToChatGPT()">
-                <i class="fas fa-comment"></i> أرسل إلى ChatGPT
+            <button class="ai-btn analyze-btn" onclick="analyzeCurrentImage()" id="aiAnalyzeBtn">
+                <i class="fas fa-brain"></i> وصف سريع
             </button>
         </div>
-
         <div class="ai-action-bar">
-            <button class="ai-btn analyze-btn" onclick="analyzeCurrentImage()" id="aiAnalyzeBtn">
-                <i class="fas fa-brain"></i> حلّل داخل التطبيق
+            <button class="ai-btn chatgpt-btn" onclick="sendToChatGPT()">
+                <i class="fas fa-share-nodes"></i> مشاركة إلى ChatGPT
+            </button>
+            <button class="ai-btn gemini-btn" onclick="sendToGemini()">
+                <i class="fas fa-share-nodes"></i> مشاركة إلى Gemini
             </button>
         </div>
 
@@ -129,11 +131,11 @@ def build_index():
                 <h3>🧠 إعدادات الذكاء الاصطناعي</h3>
             </div>
             <div class="lyrics-content">
-                <p class="ai-label">مفتاح Gemini API (للتحليل الداخلي):</p>
+                <p class="ai-label">مفتاح Gemini API (للتحليل والدردشة):</p>
                 <input type="password" class="ai-input" id="geminiKey" placeholder="AIza...">
                 <p class="ai-hint">🔗 احصل عليه من: https://aistudio.google.com/apikey</p>
 
-                <p class="ai-label">لغة التحليل:</p>
+                <p class="ai-label">لغة الردود:</p>
                 <select class="ai-select" id="aiLang">
                     <option value="ar">العربية</option>
                     <option value="en">English</option>
@@ -143,10 +145,25 @@ def build_index():
             </div>
         </div>
 
-        <!-- AI Result Panel -->
+        <!-- Chat Panel -->
+        <div class="lyrics-panel chat-panel" id="chatPanel" style="display:none">
+            <div class="lyrics-header">
+                <h3><i class="fas fa-comments"></i> دردشة Gemini</h3>
+                <button class="btn-action small" onclick="closeChat()">✕</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <!-- الرسائل تظهر هنا -->
+            </div>
+            <div class="chat-input-row">
+                <input type="text" id="chatInput" class="ai-input" placeholder="اسأل عن الصورة..." onkeypress="if(event.key==='Enter')sendChatMessage()">
+                <button class="btn-send" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <!-- AI Result Panel (للوصف السريع) -->
         <div class="ai-result-panel" id="aiResultPanel" style="display:none">
             <div class="ai-result-header">
-                <h3><i class="fas fa-brain"></i> نتيجة التحليل</h3>
+                <h3><i class="fas fa-brain"></i> نتيجة الوصف</h3>
                 <button class="btn-action small" onclick="closeAIResult()">✕</button>
             </div>
             <div class="ai-result-content" id="aiResultContent">
@@ -165,10 +182,9 @@ def build_index():
             </div>
             <div class="lyrics-content">
                 <p class="lyrics-line">📤 ارفع صورك إلى Cloudinary</p>
-                <p class="lyrics-line">🔗 احصل على رابط مباشر لكل صورة</p>
-                <p class="lyrics-line">💬 أرسل الرابط إلى Gemini أو ChatGPT</p>
-                <p class="lyrics-line">🧠 أو حلّل الصورة داخل التطبيق</p>
-                <p class="lyrics-line">📋 انسخ أو شارك أو احذف</p>
+                <p class="lyrics-line">💬 دردش مع Gemini حول أي صورة</p>
+                <p class="lyrics-line">🧠 أو احصل على وصف سريع</p>
+                <p class="lyrics-line">📤 أو شارك الصورة إلى تطبيقات AI</p>
                 <p class="lyrics-line">💾 معرضك محفوظ محليًا</p>
             </div>
         </div>
@@ -196,6 +212,7 @@ def build_index():
     <script src="uploader.js"></script>
     <script src="gallery.js"></script>
     <script src="ai.js"></script>
+    <script src="chat.js"></script>
     <script src="app.js"></script>
 </body>
 </html>"""
@@ -270,9 +287,21 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .analyze-btn{background:linear-gradient(135deg,#ff44aa,#ff6b9d);box-shadow:0 6px 20px rgba(255,68,170,0.4)}
 .analyze-btn:hover{box-shadow:0 10px 30px rgba(255,68,170,0.6)}
 
+/* Chat Panel */
+.chat-panel{display:flex;flex-direction:column;max-height:400px}
+.chat-messages{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:8px 0;margin-bottom:8px;max-height:250px}
+.chat-msg{padding:10px 14px;border-radius:16px;font-size:12px;line-height:1.6;max-width:85%;word-wrap:break-word;white-space:pre-wrap}
+.user-msg{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;align-self:flex-start;border-bottom-right-radius:4px}
+.ai-msg{background:var(--card2);color:var(--text);align-self:flex-end;border-bottom-left-radius:4px;border:1px solid var(--border)}
+.chat-input-row{display:flex;gap:8px}
+.chat-input-row .ai-input{flex:1}
+.btn-send{width:42px;height:42px;background:linear-gradient(135deg,var(--accent),var(--accent4));border:none;border-radius:50%;color:#000;font-size:16px;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center}
+.btn-send:hover{transform:scale(1.05)}
+.btn-send:active{transform:scale(0.95)}
+
 /* Panels */
-.lyrics-panel,.ai-result-panel{background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;max-height:400px;overflow-y:auto;animation:slideDown 0.4s ease}
-@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:400px}}
+.lyrics-panel,.ai-result-panel{background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;animation:slideDown 0.4s ease}
+@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:600px}}
 .lyrics-header,.ai-result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .lyrics-header h3,.ai-result-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--accent2)}
 .lyrics-line{padding:6px 0;font-size:12px;color:var(--text2);text-align:center;border-bottom:1px solid rgba(255,255,255,0.03)}
@@ -562,7 +591,7 @@ function renderGallery(){
             <div class="img-actions">
                 <button onclick="event.stopPropagation();copyLink('${g.url}')">🔗</button>
                 <button onclick="event.stopPropagation();shareLink('${g.url}')">📤</button>
-                <button class="ai" onclick="event.stopPropagation();selectImage(${i});analyzeCurrentImage();">🧠</button>
+                <button class="ai" onclick="event.stopPropagation();selectImage(${i});openChat();">💬</button>
                 <button class="danger" onclick="event.stopPropagation();removeImage(${i})">🗑️</button>
             </div>
         </div>
@@ -635,18 +664,13 @@ function formatDate(ts){const d=new Date(ts);return d.toLocaleDateString('ar')+'
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}"""
 
 # ═══════════════════════════════════════════════════════════
-# 🧠 8. ai.js  ← الملف الرئيسي للذكاء الاصطناعي
+# 🧠 8. ai.js
 # ═══════════════════════════════════════════════════════════
 
 def build_ai_js():
     return """// ═══════════════════════════════════════════════════════════
 // 🧠 AI Vision Module
-// 3 طرق:
-// 1. إرسال الرابط إلى Gemini (نسخ + فتح الموقع)
-// 2. إرسال الرابط إلى ChatGPT (نسخ + فتح الموقع)
-// 3. تحليل داخلي عبر Gemini API مباشرة
 // ═══════════════════════════════════════════════════════════
-
 let aiConfig = {geminiKey:'',lang:'ar'};
 let lastAIResult = '';
 
@@ -664,6 +688,7 @@ function toggleAISettings(){
     if(open){
         document.getElementById('infoPanel').style.display='none';
         document.getElementById('aiResultPanel').style.display='none';
+        document.getElementById('chatPanel').style.display='none';
     }
 }
 
@@ -673,71 +698,56 @@ function saveAISettings(){
         lang: document.getElementById('aiLang').value
     };
     saveAIConfig(aiConfig);
-    showToast('✅ تم حفظ إعدادات AI');
+    showToast('✅ تم حفظ الإعدادات');
     document.getElementById('aiSettingsPanel').style.display='none';
     document.getElementById('btnAI').classList.remove('active');
 }
 
 // ═══════════════════════════════════════════════════════════
-// 📋 دالة مساعدة: نسخ الرابط + فتح الموقع
+// 📤 مشاركة الصورة إلى تطبيق خارجي (Gemini / ChatGPT)
 // ═══════════════════════════════════════════════════════════
-async function copyAndOpen(url, siteName, siteUrl){
+async function shareImageToAI(siteName){
     if(currentIndex<0||!gallery[currentIndex]){
         showToast('⚠️ اختر صورة أولاً');
         return;
     }
-    const imgUrl = gallery[currentIndex].url;
+    const img = gallery[currentIndex];
+    showToast(`⏳ جاري تجهيز الصورة...`);
 
-    // نسخ الرابط
-    try{
-        await navigator.clipboard.writeText(imgUrl);
-        showToast(`📋 تم نسخ الرابط! افتح ${siteName} والصقه`);
-    }catch(e){
-        const ta = document.createElement('textarea');
-        ta.value = imgUrl;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        try{document.execCommand('copy');showToast(`📋 تم النسخ! افتح ${siteName}`)}
-        catch(err){showToast('❌ لم يتم النسخ')}
-        ta.remove();
+    try {
+        const response = await fetch(img.url, { mode: 'cors' });
+        const blob = await response.blob();
+        const file = new File([blob], img.name || 'image.jpg', { type: blob.type });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+                files: [file],
+                title: 'تحليل صورة',
+                text: 'قم بتحليل هذه الصورة'
+            });
+            showToast(`✅ اختر ${siteName} من القائمة`);
+        } else {
+            showToast('⚠️ جهازك لا يدعم المشاركة');
+        }
+    } catch (error) {
+        console.error('Share error:', error);
+        showToast('❌ فشل التجهيز');
     }
-
-    // فتح الموقع
-    setTimeout(()=>{
-        window.open(siteUrl, '_blank');
-    }, 600);
 }
 
-// ═══════════════════════════════════════════════════════════
-// 💬 إرسال إلى Gemini (نسخ + فتح)
-// ═══════════════════════════════════════════════════════════
-async function sendToGemini(){
-    await copyAndOpen(null, 'Gemini', 'https://gemini.google.com/app');
-}
+async function sendToGemini(){ await shareImageToAI('Gemini'); }
+async function sendToChatGPT(){ await shareImageToAI('ChatGPT'); }
 
 // ═══════════════════════════════════════════════════════════
-// 💬 إرسال إلى ChatGPT (نسخ + فتح)
-// ═══════════════════════════════════════════════════════════
-async function sendToChatGPT(){
-    await copyAndOpen(null, 'ChatGPT', 'https://chatgpt.com/');
-}
-
-// ═══════════════════════════════════════════════════════════
-// 🧠 التحليل الداخلي عبر Gemini API
+// 🧠 الوصف السريع (Quick Analyze)
 // ═══════════════════════════════════════════════════════════
 function getPrompt(){
-    if(aiConfig.lang==='en'){
-        return 'Describe this image in detail: content, colors, mood, possible use, and any text. Be concise but complete.';
-    }
-    return 'صف هذه الصورة بالتفصيل: ماذا تحتوي، الألوان، المشاعر، الاستخدام المحتمل، وأي نص موجود. كن موجزًا لكن شاملًا.';
+    if(aiConfig.lang==='en') return 'Describe this image in detail.';
+    return 'صف هذه الصورة بالتفصيل: المحتوى، الألوان، المشاعر، وأي نص موجود.';
 }
 
-async function analyzeWithGemini(imageUrl){
-    if(!aiConfig.geminiKey){
-        throw new Error('أدخل مفتاح Gemini أولاً (زر 🤖)');
-    }
+async function analyzeWithGemini(imageUrl, customPrompt=null){
+    if(!aiConfig.geminiKey) throw new Error('أدخل مفتاح Gemini أولاً (زر 🤖)');
 
     const imgResp = await fetch(imageUrl, {mode:'cors'});
     if(!imgResp.ok) throw new Error('تعذر تحميل الصورة');
@@ -754,11 +764,10 @@ async function analyzeWithGemini(imageUrl){
     const body = {
         contents:[{
             parts:[
-                {text:getPrompt()},
+                {text: customPrompt || getPrompt()},
                 {inline_data:{mime_type:mime,data:base64}}
             ]
-        }],
-        generationConfig:{temperature:0.4,maxOutputTokens:1024}
+        }]
     };
 
     const res = await fetch(endpoint,{
@@ -768,36 +777,24 @@ async function analyzeWithGemini(imageUrl){
     });
     const data = await res.json().catch(()=>({}));
     if(!res.ok){
-        const msg = (data.error&&data.error.message)||`HTTP ${res.status}`;
-        throw new Error(msg);
+        throw new Error((data.error&&data.error.message)||`HTTP ${res.status}`);
     }
-    const text = data.candidates
-        && data.candidates[0]
-        && data.candidates[0].content
-        && data.candidates[0].content.parts
-        && data.candidates[0].content.parts[0]
-        && data.candidates[0].content.parts[0].text;
-    if(!text) throw new Error('لم يتم استلام رد من Gemini');
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(!text) throw new Error('لم يتم استلام رد');
     return text;
 }
 
-// ═══════════════════════════════════════════════════════════
-// 🎯 تحليل الصورة الحالية داخل التطبيق
-// ═══════════════════════════════════════════════════════════
 async function analyzeCurrentImage(){
-    if(currentIndex<0||!gallery[currentIndex]){
-        showToast('⚠️ اختر صورة أولاً');
-        return;
-    }
+    if(currentIndex<0||!gallery[currentIndex]){ showToast('⚠️ اختر صورة أولاً'); return; }
     const img = gallery[currentIndex];
     const btn = document.getElementById('aiAnalyzeBtn');
     const panel = document.getElementById('aiResultPanel');
     const content = document.getElementById('aiResultContent');
 
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحليل...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
     panel.style.display='block';
-    content.innerHTML = '<p class="ai-placeholder">🧠 الذكاء الاصطناعي يقرأ الصورة...</p>';
+    content.innerHTML = '<p class="ai-placeholder">🧠 يقرأ الصورة...</p>';
     setProgress(20,'🧠 تحليل...');
 
     try{
@@ -805,31 +802,137 @@ async function analyzeCurrentImage(){
         lastAIResult = result;
         content.textContent = result;
         saveAIResult(img.publicId||img.url, result);
-        setProgress(100,'✅ تم التحليل');
+        setProgress(100,'✅ تم');
         setTimeout(()=>setProgress(0,'جاهز'),1500);
-        showToast('🧠 اكتمل التحليل');
     }catch(e){
-        console.error('AI error:',e);
         content.innerHTML = `<p class="ai-placeholder" style="color:#ff6688">❌ ${e.message}</p>`;
-        setProgress(0,'❌ فشل التحليل');
-        showToast('❌ '+e.message);
+        setProgress(0,'❌ فشل');
     }finally{
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-brain"></i> حلّل داخل التطبيق';
+        btn.innerHTML = '<i class="fas fa-brain"></i> وصف سريع';
     }
 }
 
-function closeAIResult(){
+function closeAIResult(){ document.getElementById('aiResultPanel').style.display='none'; }
+function copyAIResult(){ if(lastAIResult)copyLink(lastAIResult); }"""
+
+# ═══════════════════════════════════════════════════════════
+# 💬 9. chat.js (ملف الدردشة الجديد)
+# ═══════════════════════════════════════════════════════════
+
+def build_chat_js():
+    return """// ═══════════════════════════════════════════════════════════
+// 💬 Chat Module - دردشة تفاعلية مع Gemini حول الصورة
+// ═══════════════════════════════════════════════════════════
+let chatHistory = [];
+let chatImageBase64 = null;
+let chatImageMime = null;
+
+function openChat(){
+    if(currentIndex<0||!gallery[currentIndex]){
+        showToast('⚠️ اختر صورة أولاً');
+        return;
+    }
+    if(!aiConfig.geminiKey){
+        showToast('⚠️ أدخل مفتاح Gemini أولاً');
+        toggleAISettings();
+        return;
+    }
+    document.getElementById('chatPanel').style.display='flex';
     document.getElementById('aiResultPanel').style.display='none';
+    document.getElementById('aiSettingsPanel').style.display='none';
+    document.getElementById('infoPanel').style.display='none';
+    resetChat();
 }
 
-function copyAIResult(){
-    if(!lastAIResult){showToast('⚠️ لا نتيجة للنسخ');return}
-    copyLink(lastAIResult);
+function closeChat(){
+    document.getElementById('chatPanel').style.display='none';
+}
+
+async function resetChat(){
+    chatHistory = [];
+    const img = gallery[currentIndex];
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = '<div class="chat-msg ai-msg">⏳ جاري قراءة الصورة...</div>';
+    
+    try{
+        const resp = await fetch(img.url, {mode:'cors'});
+        const blob = await resp.blob();
+        chatImageMime = blob.type || 'image/jpeg';
+        chatImageBase64 = await new Promise((res,rej)=>{
+            const r = new FileReader();
+            r.onload=()=>res(r.result.split(',')[1]);
+            r.onerror=rej;
+            r.readAsDataURL(blob);
+        });
+        container.innerHTML = '';
+        addChatMessage('ai', '✅ تم تحميل الصورة! اسألني أي شيء عنها.\\n(مثال: ماذا يوجد فيها؟ / اقرأ النص / صف الألوان)');
+    }catch(e){
+        container.innerHTML = '';
+        addChatMessage('ai', '❌ فشل تحميل الصورة: '+e.message);
+    }
+}
+
+function addChatMessage(role, text){
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + (role === 'user' ? 'user-msg' : 'ai-msg');
+    div.textContent = text;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return div;
+}
+
+async function sendChatMessage(){
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if(!msg) return;
+    if(!chatImageBase64){
+        showToast('⏳ انتظر تحميل الصورة');
+        return;
+    }
+
+    addChatMessage('user', msg);
+    input.value = '';
+    
+    const typingEl = addChatMessage('ai', '...');
+    typingEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> يفكر...';
+
+    // إضافة سؤال المستخدم للتاريخ
+    chatHistory.push({role:'user', text:msg});
+
+    try{
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${aiConfig.geminiKey}`;
+        const body = {
+            contents: [{
+                parts: [
+                    {text: msg},
+                    {inline_data: {mime_type: chatImageMime, data: chatImageBase64}}
+                ]
+            }]
+        };
+
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+
+        const data = await res.json().catch(()=>({}));
+        if(!res.ok){
+            throw new Error((data.error && data.error.message) || 'HTTP '+res.status);
+        }
+
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'لم يتم استلام رد.';
+        typingEl.textContent = reply;
+        chatHistory.push({role:'ai', text:reply});
+    }catch(e){
+        typingEl.textContent = '❌ خطأ: '+e.message;
+    }
 }"""
 
 # ═══════════════════════════════════════════════════════════
-# ⚙️ 9. app.js
+# ⚙️ 10. app.js
 # ═══════════════════════════════════════════════════════════
 
 def build_app_js():
@@ -841,6 +944,7 @@ def build_app_js():
     if(open){
         document.getElementById('aiSettingsPanel').style.display='none';
         document.getElementById('aiResultPanel').style.display='none';
+        document.getElementById('chatPanel').style.display='none';
     }
 }
 
@@ -849,7 +953,7 @@ function toggleAutoCopy(){
     s.autoCopy=!s.autoCopy;
     saveSettings(s);
     document.getElementById('autoCopyBtn').classList.toggle('active',s.autoCopy);
-    showToast(s.autoCopy?'✅ نسخ تلقائي مفعّل':'❌ نسخ تلقائي معطّل');
+    showToast(s.autoCopy?'✅ نسخ تلقائي':'❌ نسخ تلقائي');
 }
 
 function showToast(m){
@@ -868,7 +972,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     initAI();
     const s=loadSettings();
     if(s.autoCopy)document.getElementById('autoCopyBtn').classList.add('active');
-    console.log('%c🧠 Pixel Vault AI Ready','color:#00ffcc;font-size:16px;font-weight:bold');
+    console.log('%c🧠 Pixel Vault Chat Ready','color:#00ffcc;font-size:16px;font-weight:bold');
 });"""
 
 # ═══════════════════════════════════════════════════════════
@@ -878,12 +982,12 @@ window.addEventListener('DOMContentLoaded',()=>{
 def main():
     print(f"""
 ╔══════════════════════════════════════════════════════════╗
-║  🧠  PIXEL VAULT 2044 - FULL AI BUILD  🧠               ║
+║  🧠  PIXEL VAULT 2044 - CHAT BUILD  🧠                  ║
 ║     Cloudinary: {CLOUD_NAME:<40}║
 ║     Preset: {UPLOAD_PRESET:<45}║
 ╚══════════════════════════════════════════════════════════╝
     """)
-    section("BUILDING PIXEL VAULT + FULL AI")
+    section("BUILDING PIXEL VAULT + CHAT")
 
     write("index.html", build_index())
     write("style.css", build_style())
@@ -893,30 +997,27 @@ def main():
     write("uploader.js", build_uploader_js())
     write("gallery.js", build_gallery_js())
     write("ai.js", build_ai_js())
+    write("chat.js", build_chat_js())
     write("app.js", build_app_js())
 
     print(f"""
 {'='*60}
   ✅ BUILD COMPLETE! - {TOTAL_LINES} سطر
-  📁 9 ملفات جاهزة
+  📁 10 ملفات جاهزة
 
-  ✨ الميزات:
-     ☁️ رفع صور إلى Cloudinary
-     🔗 رابط مباشر لكل صورة
-     💬 زر "أرسل إلى Gemini" (نسخ + فتح)
-     💬 زر "أرسل إلى ChatGPT" (نسخ + فتح)
-     🧠 زر "حلّل داخل التطبيق" (Gemini API)
-     📋 نسخ / مشاركة / حذف
-     💾 تخزين دائم
-     🎨 تصميم Glass Morphism
+  ✨ الميزات الجديدة:
+     💬 دردشة كاملة مع Gemini
+     🧠 وصف سريع للصورة
+     📤 مشاركة الصورة إلى Gemini/ChatGPT
+     💾 حفظ نتائج التحليل
+     📋 نسخ النتائج
 
   🚀 الخطوات:
      1. شغّل السكربت
-     2. انسخ الملفات إلى www/ في مشروع APK
+     2. انسخ الملفات إلى www/
      3. ارفع على GitHub → APK
-     4. ثبّت وافتح التطبيق
-     5. اضغط زر 🤖 وأدخل مفتاح Gemini
-     6. ارفع صورة واختر: Gemini / ChatGPT / تحليل
+     4. ثبّت → اضغط 🤖 → أدخل مفتاح Gemini
+     5. ارفع صورة → اضغط "دردشة Gemini" → اسأل!
 
   🧠 READY!
 {'='*60}
