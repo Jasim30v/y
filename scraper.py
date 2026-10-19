@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
 ╔══════════════════════════════════════════════════════════════╗
-║  🖼️  PIXEL VAULT 2044 - FIXED BUILD  🖼️                  ║
+║  🧠  PIXEL VAULT 2044 - FULL AI BUILD  🧠                 ║
 ║                                                            ║
 ║  ☁️  Cloudinary: dhu9l0lfs                                 ║
 ║  🔑 Upload Preset: go_fk3                                  ║
-║                                                            ║
-║  ✅ يعمل على: Web + Capacitor + WebView APK               ║
+║  🧠 AI: Gemini + ChatGPT + تحليل مباشر                     ║
 ║                                                            ║
 ╚══════════════════════════════════════════════════════════════╝
 """
@@ -32,7 +31,7 @@ def write(filename, content):
 
 def section(title):
     print(f"\n{'='*60}")
-    print(f"  🖼️ {title}")
+    print(f"  🧠 {title}")
     print(f"{'='*60}")
 
 # ═══════════════════════════════════════════════════════════
@@ -46,7 +45,7 @@ def build_index():
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; img-src * data: blob:; connect-src *;">
-    <title>🖼️ Pixel Vault 2044</title>
+    <title>🧠 Pixel Vault 2044 + AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -59,19 +58,22 @@ def build_index():
     <div id="particlesContainer"></div>
 
     <div class="app">
+        <!-- Header -->
         <div class="header">
             <div class="header-left">
-                <div class="logo">🖼️</div>
+                <div class="logo">🧠</div>
                 <div class="header-text">
-                    <h1>Pixel Vault</h1>
-                    <span>✦ Cloud Image Vault ✦</span>
+                    <h1>Pixel Vault AI</h1>
+                    <span>✦ Vision Enabled ✦</span>
                 </div>
             </div>
             <div class="header-right">
-                <button class="btn-icon" onclick="toggleInfo()" id="btnInfo"><i class="fas fa-circle-info"></i></button>
+                <button class="btn-icon" onclick="toggleAISettings()" id="btnAI" title="إعدادات AI"><i class="fas fa-robot"></i></button>
+                <button class="btn-icon" onclick="toggleInfo()" id="btnInfo" title="معلومات"><i class="fas fa-circle-info"></i></button>
             </div>
         </div>
 
+        <!-- Image Preview -->
         <div class="visualizer-3d" id="visualizer3D">
             <canvas id="vizCanvas"></canvas>
             <img class="preview-img" id="previewImg" alt="">
@@ -87,13 +89,15 @@ def build_index():
             </div>
         </div>
 
+        <!-- Progress -->
         <div class="progress-section">
             <div class="progress-track">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="progress-status" id="progressStatus">جاهز للرفع</div>
+            <div class="progress-status" id="progressStatus">جاهز</div>
         </div>
 
+        <!-- Controls -->
         <div class="controls">
             <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn" title="نسخ تلقائي"><i class="fas fa-copy"></i></button>
             <button class="ctrl-btn" onclick="prevImage()"><i class="fas fa-backward-step"></i></button>
@@ -103,19 +107,73 @@ def build_index():
             <button class="ctrl-btn" onclick="deleteCurrent()" title="حذف"><i class="fas fa-trash"></i></button>
         </div>
 
+        <!-- AI Action Bar -->
+        <div class="ai-action-bar">
+            <button class="ai-btn gemini-btn" onclick="sendToGemini()">
+                <i class="fas fa-comment-dots"></i> أرسل إلى Gemini
+            </button>
+            <button class="ai-btn chatgpt-btn" onclick="sendToChatGPT()">
+                <i class="fas fa-comment"></i> أرسل إلى ChatGPT
+            </button>
+        </div>
+
+        <div class="ai-action-bar">
+            <button class="ai-btn analyze-btn" onclick="analyzeCurrentImage()" id="aiAnalyzeBtn">
+                <i class="fas fa-brain"></i> حلّل داخل التطبيق
+            </button>
+        </div>
+
+        <!-- AI Settings Panel -->
+        <div class="lyrics-panel" id="aiSettingsPanel" style="display:none">
+            <div class="lyrics-header">
+                <h3>🧠 إعدادات الذكاء الاصطناعي</h3>
+            </div>
+            <div class="lyrics-content">
+                <p class="ai-label">مفتاح Gemini API (للتحليل الداخلي):</p>
+                <input type="password" class="ai-input" id="geminiKey" placeholder="AIza...">
+                <p class="ai-hint">🔗 احصل عليه من: https://aistudio.google.com/apikey</p>
+
+                <p class="ai-label">لغة التحليل:</p>
+                <select class="ai-select" id="aiLang">
+                    <option value="ar">العربية</option>
+                    <option value="en">English</option>
+                </select>
+
+                <button class="btn-action wide" onclick="saveAISettings()">💾 حفظ الإعدادات</button>
+            </div>
+        </div>
+
+        <!-- AI Result Panel -->
+        <div class="ai-result-panel" id="aiResultPanel" style="display:none">
+            <div class="ai-result-header">
+                <h3><i class="fas fa-brain"></i> نتيجة التحليل</h3>
+                <button class="btn-action small" onclick="closeAIResult()">✕</button>
+            </div>
+            <div class="ai-result-content" id="aiResultContent">
+                <p class="ai-placeholder">لم يتم التحليل بعد</p>
+            </div>
+            <div class="ai-result-actions">
+                <button class="btn-action small" onclick="copyAIResult()">📋 نسخ</button>
+                <button class="btn-action small" onclick="analyzeCurrentImage()">🔄 إعادة</button>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
         <div class="lyrics-panel" id="infoPanel" style="display:none">
             <div class="lyrics-header">
                 <h3>ℹ️ عن التطبيق</h3>
             </div>
             <div class="lyrics-content">
-                <p class="lyrics-line">📤 ارفع صورك إلى السحابة بضغطة</p>
-                <p class="lyrics-line">🔗 كل صورة تحصل على رابط مباشر</p>
+                <p class="lyrics-line">📤 ارفع صورك إلى Cloudinary</p>
+                <p class="lyrics-line">🔗 احصل على رابط مباشر لكل صورة</p>
+                <p class="lyrics-line">💬 أرسل الرابط إلى Gemini أو ChatGPT</p>
+                <p class="lyrics-line">🧠 أو حلّل الصورة داخل التطبيق</p>
                 <p class="lyrics-line">📋 انسخ أو شارك أو احذف</p>
                 <p class="lyrics-line">💾 معرضك محفوظ محليًا</p>
-                <p class="lyrics-line">☁️ مرتبط بحساب Cloudinary</p>
             </div>
         </div>
 
+        <!-- Gallery -->
         <div class="playlist-section">
             <div class="playlist-header">
                 <h3>🖼️ معرض الصور</h3>
@@ -137,6 +195,7 @@ def build_index():
     <script src="visualizer.js"></script>
     <script src="uploader.js"></script>
     <script src="gallery.js"></script>
+    <script src="ai.js"></script>
     <script src="app.js"></script>
 </body>
 </html>"""
@@ -163,7 +222,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .header-left{display:flex;align-items:center;gap:10px}
 .logo{width:46px;height:46px;background:var(--glass);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:24px;animation:logoGlow 3s ease-in-out infinite}
 @keyframes logoGlow{0%,100%{box-shadow:0 0 20px rgba(0,255,204,0.3)}50%{box-shadow:0 0 35px rgba(255,68,170,0.6)}}
-.header-text h1{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,#00ffcc,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-text h1{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:800;background:linear-gradient(135deg,#00ffcc,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .header-text span{font-size:7px;color:var(--text3);letter-spacing:3px}
 .header-right{display:flex;gap:6px}
 .btn-icon{width:38px;height:38px;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--text2);transition:all 0.3s}
@@ -194,17 +253,47 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .ctrl-play:active{transform:scale(0.95)}
 .ctrl-play:disabled{opacity:0.5;cursor:not-allowed;transform:none}
 
-.lyrics-panel{background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;max-height:300px;overflow-y:auto;animation:slideDown 0.4s ease}
-@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:300px}}
-.lyrics-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.lyrics-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--accent2)}
+/* AI Action Bar */
+.ai-action-bar{display:flex;gap:8px;justify-content:center;margin-bottom:10px;flex-wrap:wrap}
+.ai-btn{flex:1;min-width:130px;padding:12px 16px;border:none;border-radius:25px;color:#fff;font-size:12px;font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px}
+.ai-btn:hover{transform:translateY(-2px)}
+.ai-btn:active{transform:translateY(0)}
+.ai-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.ai-btn i{font-size:14px}
+
+.gemini-btn{background:linear-gradient(135deg,#6366f1,#4f46e5);box-shadow:0 6px 20px rgba(99,102,241,0.4)}
+.gemini-btn:hover{box-shadow:0 10px 30px rgba(99,102,241,0.6)}
+
+.chatgpt-btn{background:linear-gradient(135deg,#10a37f,#0d8c6d);box-shadow:0 6px 20px rgba(16,163,127,0.4)}
+.chatgpt-btn:hover{box-shadow:0 10px 30px rgba(16,163,127,0.6)}
+
+.analyze-btn{background:linear-gradient(135deg,#ff44aa,#ff6b9d);box-shadow:0 6px 20px rgba(255,68,170,0.4)}
+.analyze-btn:hover{box-shadow:0 10px 30px rgba(255,68,170,0.6)}
+
+/* Panels */
+.lyrics-panel,.ai-result-panel{background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;max-height:400px;overflow-y:auto;animation:slideDown 0.4s ease}
+@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:400px}}
+.lyrics-header,.ai-result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.lyrics-header h3,.ai-result-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--accent2)}
 .lyrics-line{padding:6px 0;font-size:12px;color:var(--text2);text-align:center;border-bottom:1px solid rgba(255,255,255,0.03)}
+
+.ai-label{font-size:11px;color:var(--text2);margin:8px 0 4px;font-family:'Cairo',sans-serif}
+.ai-input,.ai-select{width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;outline:none}
+.ai-input:focus,.ai-select:focus{border-color:var(--accent);box-shadow:0 0 15px rgba(0,255,204,0.2)}
+.ai-hint{font-size:9px;color:var(--text3);margin-top:4px;line-height:1.5;word-break:break-all}
+
+.ai-result-content{background:var(--card2);border-radius:12px;padding:12px;font-size:12px;line-height:1.7;color:var(--text);white-space:pre-wrap;max-height:250px;overflow-y:auto}
+.ai-placeholder{color:var(--text3);text-align:center}
+.ai-result-actions{display:flex;gap:8px;margin-top:10px}
+
+.btn-action{padding:7px 14px;background:var(--card2);border:1px solid var(--border);color:var(--accent);cursor:pointer;border-radius:20px;font-size:10px;font-family:'Cairo',sans-serif;transition:all 0.3s}
+.btn-action:hover{border-color:var(--accent);box-shadow:0 0 15px rgba(0,255,204,0.2)}
+.btn-action.wide{width:100%;margin-top:10px}
+.btn-action.small{flex:1;padding:6px 8px;font-size:9px}
 
 .playlist-section{margin-top:8px;padding-bottom:30px}
 .playlist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .playlist-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
-.btn-action{padding:7px 14px;background:var(--card2);border:1px solid var(--border);color:var(--accent);cursor:pointer;border-radius:20px;font-size:10px;font-family:'Cairo',sans-serif;transition:all 0.3s}
-.btn-action:hover{border-color:var(--accent);box-shadow:0 0 15px rgba(0,255,204,0.2)}
 .image-gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .img-card{position:relative;border-radius:var(--radius-sm);overflow:hidden;background:var(--card2);border:1px solid var(--border);transition:all 0.3s;cursor:pointer;aspect-ratio:1}
 .img-card:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(0,255,204,0.2)}
@@ -215,6 +304,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .img-card:hover .img-actions,.img-card.selected .img-actions{opacity:1}
 .img-card .img-actions button{flex:1;background:rgba(0,255,204,0.2);border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:6px 2px;font-size:8px;cursor:pointer;font-family:'Cairo',sans-serif}
 .img-card .img-actions button.danger{background:rgba(255,68,68,0.2);border-color:#ff4466;color:#ff4466}
+.img-card .img-actions button.ai{background:rgba(99,102,241,0.2);border-color:#6366f1;color:#a5b4fc}
 .empty-playlist{text-align:center;padding:30px;color:var(--text3);grid-column:1/-1}
 .empty-playlist span{font-size:40px;display:block;margin-bottom:8px}
 
@@ -222,14 +312,14 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .particle{position:fixed;border-radius:50%;pointer-events:none;z-index:0}
 @keyframes particleFloat{0%{transform:translateY(110vh) scale(0);opacity:0}15%{opacity:0.7}85%{opacity:0.1}100%{transform:translateY(-10vh) scale(1.5);opacity:0}}
 
-@media(max-width:400px){.controls{gap:10px}}"""
+@media(max-width:400px){.controls{gap:10px}.ai-btn{padding:10px 12px;font-size:11px;min-width:110px}}"""
 
 # ═══════════════════════════════════════════════════════════
 # 💾 3. storage.js
 # ═══════════════════════════════════════════════════════════
 
 def build_storage_js():
-    return """const KEYS={gallery:'pixelvault_gallery',settings:'pixelvault_settings'};
+    return """const KEYS={gallery:'pixelvault_gallery',settings:'pixelvault_settings',ai:'pixelvault_ai',results:'pixelvault_results'};
 function saveData(k,v){try{localStorage.setItem(k,JSON.stringify(v));return 1}catch(e){console.warn('storage full',e);return 0}}
 function loadData(k,d=null){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 
@@ -237,7 +327,20 @@ function saveGallery(g){return saveData(KEYS.gallery,g)}
 function loadGallery(){return loadData(KEYS.gallery,[])}
 
 function saveSettings(s){return saveData(KEYS.settings,s)}
-function loadSettings(){return loadData(KEYS.settings,{autoCopy:false})}"""
+function loadSettings(){return loadData(KEYS.settings,{autoCopy:false})}
+
+function saveAIConfig(c){return saveData(KEYS.ai,c)}
+function loadAIConfig(){return loadData(KEYS.ai,{geminiKey:'',lang:'ar'})}
+
+function saveAIResult(imageId,result){
+    const all=loadData(KEYS.results,{});
+    all[imageId]={result:result,at:Date.now()};
+    saveData(KEYS.results,all);
+}
+function getAIResult(imageId){
+    const all=loadData(KEYS.results,{});
+    return all[imageId]||null;
+}"""
 
 # ═══════════════════════════════════════════════════════════
 # ✨ 4. particles.js
@@ -326,19 +429,14 @@ function showPreview(url,name){
 }"""
 
 # ═══════════════════════════════════════════════════════════
-# ☁️ 6. uploader.js  ← الملف الأساسي المُصلَح
+# ☁️ 6. uploader.js
 # ═══════════════════════════════════════════════════════════
 
 def build_uploader_js():
-    return """// ═══════════════════════════════════════════════════════════
-// ☁️ Cloudinary Uploader - Fixed Version
-// يستخدم fetch + يدعم Capacitor + WebView + Web
-// ═══════════════════════════════════════════════════════════
-const CLOUD_NAME='""" + CLOUD_NAME + """';
+    return """const CLOUD_NAME='""" + CLOUD_NAME + """';
 const UPLOAD_PRESET='""" + UPLOAD_PRESET + """';
 const UPLOAD_URL=`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
-// تحويل الملف إلى Base64 (fallback موثوق في WebView)
 function fileToBase64(file){
     return new Promise((resolve,reject)=>{
         const reader=new FileReader();
@@ -348,9 +446,7 @@ function fileToBase64(file){
     });
 }
 
-// الرفع الرئيسي
 async function uploadImage(file){
-    // فحص النوع
     if(!file.type||!file.type.startsWith('image/')){
         showToast('❌ ليس ملف صورة');
         return null;
@@ -358,72 +454,36 @@ async function uploadImage(file){
     if(file.size>10485760){
         showToast('⚠️ الصورة كبيرة (10MB)');
     }
-
     setProgress(10,'⏳ تجهيز الملف...');
-
     try{
-        // ─── المحاولة 1: fetch + FormData (الأفضل) ───
         const fd=new FormData();
         fd.append('file',file);
         fd.append('upload_preset',UPLOAD_PRESET);
-
         setProgress(25,'⏳ جاري الرفع...');
-
-        const res=await fetch(UPLOAD_URL,{
-            method:'POST',
-            body:fd,
-            mode:'cors',
-            cache:'no-cache'
-        });
-
+        const res=await fetch(UPLOAD_URL,{method:'POST',body:fd,mode:'cors',cache:'no-cache'});
         const data=await res.json().catch(()=>({}));
-
         if(res.ok&&data.secure_url){
             setProgress(100,'✅ تم الرفع');
-            setTimeout(()=>setProgress(0,'جاهز للرفع'),1500);
-            return {
-                url:data.secure_url,
-                publicId:data.public_id,
-                name:file.name,
-                size:file.size,
-                at:Date.now()
-            };
+            setTimeout(()=>setProgress(0,'جاهز'),1500);
+            return {url:data.secure_url,publicId:data.public_id,name:file.name,size:file.size,at:Date.now()};
         }
-
-        // فشل fetch — نحاول Base64
         const errMsg=(data.error&&data.error.message)||`HTTP ${res.status}`;
         console.warn('fetch upload failed:',errMsg);
-
-        // ─── المحاولة 2: Base64 (يعمل دائمًا في WebView) ───
         setProgress(40,'⏳ محاولة بديلة...');
         const base64=await fileToBase64(file);
-
         const res2=await fetch(UPLOAD_URL,{
             method:'POST',
             headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-                file:base64,
-                upload_preset:UPLOAD_PRESET
-            })
+            body:JSON.stringify({file:base64,upload_preset:UPLOAD_PRESET})
         });
-
         const data2=await res2.json().catch(()=>({}));
-
         if(res2.ok&&data2.secure_url){
             setProgress(100,'✅ تم الرفع');
-            setTimeout(()=>setProgress(0,'جاهز للرفع'),1500);
-            return {
-                url:data2.secure_url,
-                publicId:data2.public_id,
-                name:file.name,
-                size:file.size,
-                at:Date.now()
-            };
+            setTimeout(()=>setProgress(0,'جاهز'),1500);
+            return {url:data2.secure_url,publicId:data2.public_id,name:file.name,size:file.size,at:Date.now()};
         }
-
         const err2=(data2.error&&data2.error.message)||`HTTP ${res2.status}`;
         throw new Error(err2);
-
     }catch(e){
         console.error('upload error:',e);
         setProgress(0,'❌ '+e.message);
@@ -440,7 +500,7 @@ function setProgress(pct,status){
 }"""
 
 # ═══════════════════════════════════════════════════════════
-# 🖼️ 7. gallery.js  ← مُصلَح
+# 🖼️ 7. gallery.js
 # ═══════════════════════════════════════════════════════════
 
 def build_gallery_js():
@@ -462,43 +522,30 @@ async function handleFiles(input){
     if(isUploading){showToast('⏳ انتظر انتهاء الرفع');return}
     const files=Array.from(input.files||[]);
     if(!files.length)return;
-
     isUploading=true;
     const btn=document.getElementById('uploadBtn');
     if(btn)btn.disabled=true;
-
     let ok=0,fail=0;
-    const wasEmpty=gallery.length===0;
-
     for(const f of files){
         const res=await uploadImage(f);
         if(res){
-            // الصورة المرفوعة حديثًا تُضاف في البداية
             gallery.unshift(res);
             saveGallery(gallery);
             ok++;
             if(loadSettings().autoCopy)copyLink(res.url);
         }else fail++;
     }
-
-    // بعد انتهاء كل الرفع — نحدّد الصورة الأولى كـ selected
     if(ok>0){
         currentIndex=0;
         renderGallery();
         selectImage(0,false);
-        // تأثير بصري احتفالي
         if(typeof pulseViz==='function')pulseViz();
     }
-
     isUploading=false;
     if(btn)btn.disabled=false;
     input.value='';
-
-    if(ok>0){
-        showToast(`✅ تم رفع ${ok} صورة${fail?` · ${fail} فشلت`:''}`);
-    }else if(fail>0){
-        showToast(`❌ فشل رفع ${fail} صورة`);
-    }
+    if(ok>0)showToast(`✅ تم رفع ${ok} صورة${fail?` · ${fail} فشلت`:''}`);
+    else if(fail>0)showToast(`❌ فشل رفع ${fail} صورة`);
 }
 
 function renderGallery(){
@@ -515,6 +562,7 @@ function renderGallery(){
             <div class="img-actions">
                 <button onclick="event.stopPropagation();copyLink('${g.url}')">🔗</button>
                 <button onclick="event.stopPropagation();shareLink('${g.url}')">📤</button>
+                <button class="ai" onclick="event.stopPropagation();selectImage(${i});analyzeCurrentImage();">🧠</button>
                 <button class="danger" onclick="event.stopPropagation();removeImage(${i})">🗑️</button>
             </div>
         </div>
@@ -532,15 +580,8 @@ function selectImage(i,silent=true){
     if(silent)showToast('👁️ '+g.name);
 }
 
-function nextImage(){
-    if(!gallery.length)return;
-    selectImage((currentIndex+1)%gallery.length);
-}
-
-function prevImage(){
-    if(!gallery.length)return;
-    selectImage((currentIndex-1+gallery.length)%gallery.length);
-}
+function nextImage(){if(!gallery.length)return;selectImage((currentIndex+1)%gallery.length)}
+function prevImage(){if(!gallery.length)return;selectImage((currentIndex-1+gallery.length)%gallery.length)}
 
 function removeImage(i){
     if(!gallery.length)return;
@@ -557,36 +598,26 @@ function removeImage(i){
         renderGallery();
         selectImage(currentIndex,false);
     }
-    showToast('🗑️ تم الحذف من المعرض');
+    showToast('🗑️ تم الحذف');
 }
 
-function deleteCurrent(){
-    if(currentIndex>=0)removeImage(currentIndex);
-    else showToast('⚠️ لا توجد صورة محددة');
-}
+function deleteCurrent(){if(currentIndex>=0)removeImage(currentIndex);else showToast('⚠️ لا توجد صورة محددة')}
 
 function clearGallery(){
     if(!gallery.length){showToast('⚠️ المعرض فارغ');return}
-    if(!confirm('مسح كل الصور من المعرض المحلي؟'))return;
-    gallery=[];
-    currentIndex=-1;
-    saveGallery([]);
-    renderGallery();
-    showPreview(null);
+    if(!confirm('مسح كل الصور؟'))return;
+    gallery=[];currentIndex=-1;
+    saveGallery([]);renderGallery();showPreview(null);
     showToast('🗑️ تم مسح المعرض');
 }
 
 function copyLink(url){
-    const done=()=>showToast('📋 تم نسخ الرابط');
+    const done=()=>showToast('📋 تم النسخ');
     const fallback=()=>{
         const ta=document.createElement('textarea');
-        ta.value=url;
-        ta.style.position='fixed';
-        ta.style.opacity='0';
-        document.body.appendChild(ta);
-        ta.select();
-        try{document.execCommand('copy');done()}
-        catch(e){showToast('❌ لم يتم النسخ')}
+        ta.value=url;ta.style.position='fixed';ta.style.opacity='0';
+        document.body.appendChild(ta);ta.select();
+        try{document.execCommand('copy');done()}catch(e){showToast('❌ لم يتم النسخ')}
         ta.remove();
     };
     if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -595,34 +626,222 @@ function copyLink(url){
 }
 
 function shareLink(url){
-    if(navigator.share){
-        navigator.share({url:url,title:'Pixel Vault 2044'}).catch(()=>{});
-    }else copyLink(url);
+    if(navigator.share)navigator.share({url:url,title:'Pixel Vault 2044'}).catch(()=>{});
+    else copyLink(url);
 }
 
-function formatSize(b){
-    if(b>1048576)return (b/1048576).toFixed(1)+' MB';
-    return (b/1024).toFixed(1)+' KB';
+function formatSize(b){if(b>1048576)return (b/1048576).toFixed(1)+' MB';return (b/1024).toFixed(1)+' KB'}
+function formatDate(ts){const d=new Date(ts);return d.toLocaleDateString('ar')+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}"""
+
+# ═══════════════════════════════════════════════════════════
+# 🧠 8. ai.js  ← الملف الرئيسي للذكاء الاصطناعي
+# ═══════════════════════════════════════════════════════════
+
+def build_ai_js():
+    return """// ═══════════════════════════════════════════════════════════
+// 🧠 AI Vision Module
+// 3 طرق:
+// 1. إرسال الرابط إلى Gemini (نسخ + فتح الموقع)
+// 2. إرسال الرابط إلى ChatGPT (نسخ + فتح الموقع)
+// 3. تحليل داخلي عبر Gemini API مباشرة
+// ═══════════════════════════════════════════════════════════
+
+let aiConfig = {geminiKey:'',lang:'ar'};
+let lastAIResult = '';
+
+function initAI(){
+    aiConfig = loadAIConfig();
+    document.getElementById('geminiKey').value = aiConfig.geminiKey||'';
+    document.getElementById('aiLang').value = aiConfig.lang||'ar';
 }
 
-function formatDate(ts){
-    const d=new Date(ts);
-    return d.toLocaleDateString('ar')+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+function toggleAISettings(){
+    const p = document.getElementById('aiSettingsPanel');
+    const open = p.style.display==='none';
+    p.style.display = open?'block':'none';
+    document.getElementById('btnAI').classList.toggle('active', open);
+    if(open){
+        document.getElementById('infoPanel').style.display='none';
+        document.getElementById('aiResultPanel').style.display='none';
+    }
 }
 
-function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function saveAISettings(){
+    aiConfig = {
+        geminiKey: document.getElementById('geminiKey').value.trim(),
+        lang: document.getElementById('aiLang').value
+    };
+    saveAIConfig(aiConfig);
+    showToast('✅ تم حفظ إعدادات AI');
+    document.getElementById('aiSettingsPanel').style.display='none';
+    document.getElementById('btnAI').classList.remove('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+// 📋 دالة مساعدة: نسخ الرابط + فتح الموقع
+// ═══════════════════════════════════════════════════════════
+async function copyAndOpen(url, siteName, siteUrl){
+    if(currentIndex<0||!gallery[currentIndex]){
+        showToast('⚠️ اختر صورة أولاً');
+        return;
+    }
+    const imgUrl = gallery[currentIndex].url;
+
+    // نسخ الرابط
+    try{
+        await navigator.clipboard.writeText(imgUrl);
+        showToast(`📋 تم نسخ الرابط! افتح ${siteName} والصقه`);
+    }catch(e){
+        const ta = document.createElement('textarea');
+        ta.value = imgUrl;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try{document.execCommand('copy');showToast(`📋 تم النسخ! افتح ${siteName}`)}
+        catch(err){showToast('❌ لم يتم النسخ')}
+        ta.remove();
+    }
+
+    // فتح الموقع
+    setTimeout(()=>{
+        window.open(siteUrl, '_blank');
+    }, 600);
+}
+
+// ═══════════════════════════════════════════════════════════
+// 💬 إرسال إلى Gemini (نسخ + فتح)
+// ═══════════════════════════════════════════════════════════
+async function sendToGemini(){
+    await copyAndOpen(null, 'Gemini', 'https://gemini.google.com/app');
+}
+
+// ═══════════════════════════════════════════════════════════
+// 💬 إرسال إلى ChatGPT (نسخ + فتح)
+// ═══════════════════════════════════════════════════════════
+async function sendToChatGPT(){
+    await copyAndOpen(null, 'ChatGPT', 'https://chatgpt.com/');
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🧠 التحليل الداخلي عبر Gemini API
+// ═══════════════════════════════════════════════════════════
+function getPrompt(){
+    if(aiConfig.lang==='en'){
+        return 'Describe this image in detail: content, colors, mood, possible use, and any text. Be concise but complete.';
+    }
+    return 'صف هذه الصورة بالتفصيل: ماذا تحتوي، الألوان، المشاعر، الاستخدام المحتمل، وأي نص موجود. كن موجزًا لكن شاملًا.';
+}
+
+async function analyzeWithGemini(imageUrl){
+    if(!aiConfig.geminiKey){
+        throw new Error('أدخل مفتاح Gemini أولاً (زر 🤖)');
+    }
+
+    const imgResp = await fetch(imageUrl, {mode:'cors'});
+    if(!imgResp.ok) throw new Error('تعذر تحميل الصورة');
+    const blob = await imgResp.blob();
+    const base64 = await new Promise((res,rej)=>{
+        const r = new FileReader();
+        r.onload=()=>res(r.result.split(',')[1]);
+        r.onerror=rej;
+        r.readAsDataURL(blob);
+    });
+    const mime = blob.type || 'image/jpeg';
+
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${aiConfig.geminiKey}`;
+    const body = {
+        contents:[{
+            parts:[
+                {text:getPrompt()},
+                {inline_data:{mime_type:mime,data:base64}}
+            ]
+        }],
+        generationConfig:{temperature:0.4,maxOutputTokens:1024}
+    };
+
+    const res = await fetch(endpoint,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(body)
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){
+        const msg = (data.error&&data.error.message)||`HTTP ${res.status}`;
+        throw new Error(msg);
+    }
+    const text = data.candidates
+        && data.candidates[0]
+        && data.candidates[0].content
+        && data.candidates[0].content.parts
+        && data.candidates[0].content.parts[0]
+        && data.candidates[0].content.parts[0].text;
+    if(!text) throw new Error('لم يتم استلام رد من Gemini');
+    return text;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🎯 تحليل الصورة الحالية داخل التطبيق
+// ═══════════════════════════════════════════════════════════
+async function analyzeCurrentImage(){
+    if(currentIndex<0||!gallery[currentIndex]){
+        showToast('⚠️ اختر صورة أولاً');
+        return;
+    }
+    const img = gallery[currentIndex];
+    const btn = document.getElementById('aiAnalyzeBtn');
+    const panel = document.getElementById('aiResultPanel');
+    const content = document.getElementById('aiResultContent');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحليل...';
+    panel.style.display='block';
+    content.innerHTML = '<p class="ai-placeholder">🧠 الذكاء الاصطناعي يقرأ الصورة...</p>';
+    setProgress(20,'🧠 تحليل...');
+
+    try{
+        const result = await analyzeWithGemini(img.url);
+        lastAIResult = result;
+        content.textContent = result;
+        saveAIResult(img.publicId||img.url, result);
+        setProgress(100,'✅ تم التحليل');
+        setTimeout(()=>setProgress(0,'جاهز'),1500);
+        showToast('🧠 اكتمل التحليل');
+    }catch(e){
+        console.error('AI error:',e);
+        content.innerHTML = `<p class="ai-placeholder" style="color:#ff6688">❌ ${e.message}</p>`;
+        setProgress(0,'❌ فشل التحليل');
+        showToast('❌ '+e.message);
+    }finally{
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-brain"></i> حلّل داخل التطبيق';
+    }
+}
+
+function closeAIResult(){
+    document.getElementById('aiResultPanel').style.display='none';
+}
+
+function copyAIResult(){
+    if(!lastAIResult){showToast('⚠️ لا نتيجة للنسخ');return}
+    copyLink(lastAIResult);
 }"""
 
 # ═══════════════════════════════════════════════════════════
-# ⚙️ 8. app.js
+# ⚙️ 9. app.js
 # ═══════════════════════════════════════════════════════════
 
 def build_app_js():
     return """function toggleInfo(){
     const p=document.getElementById('infoPanel');
-    p.style.display=p.style.display==='none'?'block':'none';
-    document.getElementById('btnInfo').classList.toggle('active',p.style.display==='block');
+    const open = p.style.display==='none';
+    p.style.display = open?'block':'none';
+    document.getElementById('btnInfo').classList.toggle('active', open);
+    if(open){
+        document.getElementById('aiSettingsPanel').style.display='none';
+        document.getElementById('aiResultPanel').style.display='none';
+    }
 }
 
 function toggleAutoCopy(){
@@ -642,17 +861,14 @@ function showToast(m){
     window._toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-// ─── التهيئة ───
 window.addEventListener('DOMContentLoaded',()=>{
     initParticles();
     initVisualizer();
     initGallery();
-
+    initAI();
     const s=loadSettings();
     if(s.autoCopy)document.getElementById('autoCopyBtn').classList.add('active');
-
-    console.log('%c🖼️ Pixel Vault 2044 Ready','color:#00ffcc;font-size:16px;font-weight:bold');
-    console.log('%c☁️ Cloudinary: """ + CLOUD_NAME + """','color:#6366f1');
+    console.log('%c🧠 Pixel Vault AI Ready','color:#00ffcc;font-size:16px;font-weight:bold');
 });"""
 
 # ═══════════════════════════════════════════════════════════
@@ -662,12 +878,12 @@ window.addEventListener('DOMContentLoaded',()=>{
 def main():
     print(f"""
 ╔══════════════════════════════════════════════════════════╗
-║  🖼️  PIXEL VAULT 2044 - FIXED BUILD  🖼️                ║
+║  🧠  PIXEL VAULT 2044 - FULL AI BUILD  🧠               ║
 ║     Cloudinary: {CLOUD_NAME:<40}║
 ║     Preset: {UPLOAD_PRESET:<45}║
 ╚══════════════════════════════════════════════════════════╝
     """)
-    section("BUILDING FIXED PIXEL VAULT")
+    section("BUILDING PIXEL VAULT + FULL AI")
 
     write("index.html", build_index())
     write("style.css", build_style())
@@ -676,30 +892,33 @@ def main():
     write("visualizer.js", build_visualizer_js())
     write("uploader.js", build_uploader_js())
     write("gallery.js", build_gallery_js())
+    write("ai.js", build_ai_js())
     write("app.js", build_app_js())
 
     print(f"""
 {'='*60}
   ✅ BUILD COMPLETE! - {TOTAL_LINES} سطر
-  📁 8 ملفات جاهزة
+  📁 9 ملفات جاهزة
 
-  🔧 الإصلاحات:
-     ✅ fetch بدل XHR (أخف وأكثر توافقًا)
-     ✅ fallback Base64 إذا فشل FormData
-     ✅ إصلاح currentIndex بعد الرفع
-     ✅ معاينة فورية للصورة المرفوعة
-     ✅ إظهار الأخطاء الحقيقية في toast
-     ✅ DOMContentLoaded للتهيئة الآمنة
-     ✅ CSP meta لتجنب حظر الطلبات
-     ✅ onerror للصور التالفة
+  ✨ الميزات:
+     ☁️ رفع صور إلى Cloudinary
+     🔗 رابط مباشر لكل صورة
+     💬 زر "أرسل إلى Gemini" (نسخ + فتح)
+     💬 زر "أرسل إلى ChatGPT" (نسخ + فتح)
+     🧠 زر "حلّل داخل التطبيق" (Gemini API)
+     📋 نسخ / مشاركة / حذف
+     💾 تخزين دائم
+     🎨 تصميم Glass Morphism
 
   🚀 الخطوات:
      1. شغّل السكربت
-     2. انسخ الـ 8 ملفات إلى www/
+     2. انسخ الملفات إلى www/ في مشروع APK
      3. ارفع على GitHub → APK
-     4. ثبّت واختبر
+     4. ثبّت وافتح التطبيق
+     5. اضغط زر 🤖 وأدخل مفتاح Gemini
+     6. ارفع صورة واختر: Gemini / ChatGPT / تحليل
 
-  🖼️ PIXEL VAULT 2044 READY!
+  🧠 READY!
 {'='*60}
     """)
 
