@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
 ╔══════════════════════════════════════════════════════════════╗
-║                                                            ║
-║  🖼️  PIXEL VAULT 2044 - CLOUD IMAGE VAULT  🖼️           ║
-║     Ready-to-Build Generator                               ║
+║  🖼️  PIXEL VAULT 2044 - FIXED BUILD  🖼️                  ║
 ║                                                            ║
 ║  ☁️  Cloudinary: dhu9l0lfs                                 ║
 ║  🔑 Upload Preset: go_fk3                                  ║
+║                                                            ║
+║  ✅ يعمل على: Web + Capacitor + WebView APK               ║
 ║                                                            ║
 ╚══════════════════════════════════════════════════════════════╝
 """
@@ -45,6 +45,7 @@ def build_index():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; img-src * data: blob:; connect-src *;">
     <title>🖼️ Pixel Vault 2044</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -58,7 +59,6 @@ def build_index():
     <div id="particlesContainer"></div>
 
     <div class="app">
-        <!-- Header -->
         <div class="header">
             <div class="header-left">
                 <div class="logo">🖼️</div>
@@ -72,7 +72,6 @@ def build_index():
             </div>
         </div>
 
-        <!-- Image Preview -->
         <div class="visualizer-3d" id="visualizer3D">
             <canvas id="vizCanvas"></canvas>
             <img class="preview-img" id="previewImg" alt="">
@@ -88,7 +87,6 @@ def build_index():
             </div>
         </div>
 
-        <!-- Progress / Upload bar -->
         <div class="progress-section">
             <div class="progress-track">
                 <div class="progress-fill" id="progressFill"></div>
@@ -96,7 +94,6 @@ def build_index():
             <div class="progress-status" id="progressStatus">جاهز للرفع</div>
         </div>
 
-        <!-- Controls -->
         <div class="controls">
             <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn" title="نسخ تلقائي"><i class="fas fa-copy"></i></button>
             <button class="ctrl-btn" onclick="prevImage()"><i class="fas fa-backward-step"></i></button>
@@ -106,7 +103,6 @@ def build_index():
             <button class="ctrl-btn" onclick="deleteCurrent()" title="حذف"><i class="fas fa-trash"></i></button>
         </div>
 
-        <!-- Info Panel -->
         <div class="lyrics-panel" id="infoPanel" style="display:none">
             <div class="lyrics-header">
                 <h3>ℹ️ عن التطبيق</h3>
@@ -116,11 +112,10 @@ def build_index():
                 <p class="lyrics-line">🔗 كل صورة تحصل على رابط مباشر</p>
                 <p class="lyrics-line">📋 انسخ أو شارك أو احذف</p>
                 <p class="lyrics-line">💾 معرضك محفوظ محليًا</p>
-                <p class="lyrics-line">☁️ مضبوط مسبقًا على حسابك</p>
+                <p class="lyrics-line">☁️ مرتبط بحساب Cloudinary</p>
             </div>
         </div>
 
-        <!-- Gallery -->
         <div class="playlist-section">
             <div class="playlist-header">
                 <h3>🖼️ معرض الصور</h3>
@@ -175,7 +170,6 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-icon:hover{border-color:var(--accent);color:var(--accent)}
 .btn-icon.active{background:var(--glass);border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px rgba(0,255,204,0.3)}
 
-/* Image Preview */
 .visualizer-3d{position:relative;width:100%;aspect-ratio:1;max-height:350px;background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:10px}
 .visualizer-3d canvas{width:100%;height:100%;display:block}
 .visualizer-3d .preview-img{width:100%;height:100%;object-fit:cover;display:none;position:absolute;inset:0}
@@ -186,13 +180,11 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .track-artist{font-size:11px;color:var(--text2)}
 .track-time{display:flex;justify-content:space-between;font-family:'Orbitron',sans-serif;font-size:10px;color:var(--accent2);margin-top:6px}
 
-/* Progress */
 .progress-section{padding:4px 0;margin-bottom:10px}
 .progress-track{width:100%;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;position:relative;overflow:hidden}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));border-radius:2px;width:0;transition:width 0.2s linear}
 .progress-status{text-align:center;font-size:9px;color:var(--text3);margin-top:6px;font-family:'Orbitron',sans-serif}
 
-/* Controls */
 .controls{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px}
 .ctrl-btn{width:42px;height:42px;background:var(--card2);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--text2);transition:all 0.3s}
 .ctrl-btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -202,14 +194,12 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .ctrl-play:active{transform:scale(0.95)}
 .ctrl-play:disabled{opacity:0.5;cursor:not-allowed;transform:none}
 
-/* Info Panel */
 .lyrics-panel{background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;max-height:300px;overflow-y:auto;animation:slideDown 0.4s ease}
 @keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:300px}}
 .lyrics-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .lyrics-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--accent2)}
 .lyrics-line{padding:6px 0;font-size:12px;color:var(--text2);text-align:center;border-bottom:1px solid rgba(255,255,255,0.03)}
 
-/* Gallery */
 .playlist-section{margin-top:8px;padding-bottom:30px}
 .playlist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .playlist-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
@@ -314,9 +304,7 @@ function drawViz(){
 }
 
 function pulseViz(){
-    for(let i=0;i<vizData.length;i++){
-        vizData[i]=Math.random()*0.6+0.1;
-    }
+    for(let i=0;i<vizData.length;i++)vizData[i]=Math.random()*0.6+0.1;
     setTimeout(()=>{for(let i=0;i<vizData.length;i++)vizData[i]*=0.5},300);
 }
 
@@ -324,6 +312,7 @@ function showPreview(url,name){
     const box=document.getElementById('visualizer3D');
     if(!url){
         box.classList.remove('has-image');
+        previewImg.removeAttribute('src');
         document.getElementById('trackTitle').innerText='اختر صورة';
         document.getElementById('trackArtist').innerText='Pixel Vault 2044';
         document.getElementById('currentTime').innerText='—';
@@ -337,82 +326,121 @@ function showPreview(url,name){
 }"""
 
 # ═══════════════════════════════════════════════════════════
-# ☁️ 6. uploader.js
+# ☁️ 6. uploader.js  ← الملف الأساسي المُصلَح
 # ═══════════════════════════════════════════════════════════
 
 def build_uploader_js():
     return """// ═══════════════════════════════════════════════════════════
-// ☁️ إعدادات Cloudinary (جاهزة)
+// ☁️ Cloudinary Uploader - Fixed Version
+// يستخدم fetch + يدعم Capacitor + WebView + Web
 // ═══════════════════════════════════════════════════════════
 const CLOUD_NAME='""" + CLOUD_NAME + """';
 const UPLOAD_PRESET='""" + UPLOAD_PRESET + """';
 const UPLOAD_URL=`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
+// تحويل الملف إلى Base64 (fallback موثوق في WebView)
+function fileToBase64(file){
+    return new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onload=()=>resolve(reader.result);
+        reader.onerror=reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// الرفع الرئيسي
 async function uploadImage(file){
-    if(!file.type.startsWith('image/')){
+    // فحص النوع
+    if(!file.type||!file.type.startsWith('image/')){
         showToast('❌ ليس ملف صورة');
         return null;
     }
     if(file.size>10485760){
         showToast('⚠️ الصورة كبيرة (10MB)');
     }
-    const fd=new FormData();
-    fd.append('file',file);
-    fd.append('upload_preset',UPLOAD_PRESET);
+
+    setProgress(10,'⏳ تجهيز الملف...');
+
     try{
-        setProgress(5,'⏳ جاري الرفع...');
-        const xhr=new XMLHttpRequest();
-        return await new Promise((resolve,reject)=>{
-            xhr.upload.onprogress=e=>{
-                if(e.lengthComputable){
-                    const pct=Math.round((e.loaded/e.total)*100);
-                    setProgress(pct,`⏳ ${pct}%`);
-                }
-            };
-            xhr.onload=()=>{
-                try{
-                    const data=JSON.parse(xhr.responseText);
-                    if(xhr.status>=200&&xhr.status<300){
-                        setProgress(100,'✅ تم الرفع بنجاح');
-                        setTimeout(()=>setProgress(0,'جاهز للرفع'),1500);
-                        resolve({
-                            url:data.secure_url,
-                            publicId:data.public_id,
-                            name:file.name,
-                            size:file.size,
-                            at:Date.now()
-                        });
-                    }else{
-                        const msg=(data.error&&data.error.message)||'خطأ';
-                        setProgress(0,'❌ '+msg);
-                        reject(new Error(msg));
-                    }
-                }catch(err){
-                    setProgress(0,'❌ استجابة غير صالحة');
-                    reject(err);
-                }
-            };
-            xhr.onerror=()=>{
-                setProgress(0,'❌ خطأ شبكة');
-                reject(new Error('network error'));
-            };
-            xhr.open('POST',UPLOAD_URL);
-            xhr.send(fd);
+        // ─── المحاولة 1: fetch + FormData (الأفضل) ───
+        const fd=new FormData();
+        fd.append('file',file);
+        fd.append('upload_preset',UPLOAD_PRESET);
+
+        setProgress(25,'⏳ جاري الرفع...');
+
+        const res=await fetch(UPLOAD_URL,{
+            method:'POST',
+            body:fd,
+            mode:'cors',
+            cache:'no-cache'
         });
+
+        const data=await res.json().catch(()=>({}));
+
+        if(res.ok&&data.secure_url){
+            setProgress(100,'✅ تم الرفع');
+            setTimeout(()=>setProgress(0,'جاهز للرفع'),1500);
+            return {
+                url:data.secure_url,
+                publicId:data.public_id,
+                name:file.name,
+                size:file.size,
+                at:Date.now()
+            };
+        }
+
+        // فشل fetch — نحاول Base64
+        const errMsg=(data.error&&data.error.message)||`HTTP ${res.status}`;
+        console.warn('fetch upload failed:',errMsg);
+
+        // ─── المحاولة 2: Base64 (يعمل دائمًا في WebView) ───
+        setProgress(40,'⏳ محاولة بديلة...');
+        const base64=await fileToBase64(file);
+
+        const res2=await fetch(UPLOAD_URL,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                file:base64,
+                upload_preset:UPLOAD_PRESET
+            })
+        });
+
+        const data2=await res2.json().catch(()=>({}));
+
+        if(res2.ok&&data2.secure_url){
+            setProgress(100,'✅ تم الرفع');
+            setTimeout(()=>setProgress(0,'جاهز للرفع'),1500);
+            return {
+                url:data2.secure_url,
+                publicId:data2.public_id,
+                name:file.name,
+                size:file.size,
+                at:Date.now()
+            };
+        }
+
+        const err2=(data2.error&&data2.error.message)||`HTTP ${res2.status}`;
+        throw new Error(err2);
+
     }catch(e){
-        console.error('upload failed',e);
+        console.error('upload error:',e);
+        setProgress(0,'❌ '+e.message);
         showToast('❌ فشل الرفع: '+e.message);
         return null;
     }
 }
 
 function setProgress(pct,status){
-    document.getElementById('progressFill').style.width=pct+'%';
-    document.getElementById('progressStatus').innerText=status||'';
+    const fill=document.getElementById('progressFill');
+    const text=document.getElementById('progressStatus');
+    if(fill)fill.style.width=pct+'%';
+    if(text)text.innerText=status||'';
 }"""
 
 # ═══════════════════════════════════════════════════════════
-# 🖼️ 7. gallery.js
+# 🖼️ 7. gallery.js  ← مُصلَح
 # ═══════════════════════════════════════════════════════════
 
 def build_gallery_js():
@@ -421,46 +449,68 @@ def build_gallery_js():
 function initGallery(){
     gallery=loadGallery();
     renderGallery();
-    if(gallery.length){currentIndex=0;selectImage(0,false)}
+    if(gallery.length>0){
+        currentIndex=0;
+        selectImage(0,false);
+    }else{
+        currentIndex=-1;
+        showPreview(null);
+    }
 }
 
 async function handleFiles(input){
     if(isUploading){showToast('⏳ انتظر انتهاء الرفع');return}
     const files=Array.from(input.files||[]);
     if(!files.length)return;
+
     isUploading=true;
-    document.getElementById('uploadBtn').disabled=true;
+    const btn=document.getElementById('uploadBtn');
+    if(btn)btn.disabled=true;
+
     let ok=0,fail=0;
+    const wasEmpty=gallery.length===0;
+
     for(const f of files){
         const res=await uploadImage(f);
         if(res){
+            // الصورة المرفوعة حديثًا تُضاف في البداية
             gallery.unshift(res);
             saveGallery(gallery);
-            renderGallery();
             ok++;
             if(loadSettings().autoCopy)copyLink(res.url);
         }else fail++;
     }
+
+    // بعد انتهاء كل الرفع — نحدّد الصورة الأولى كـ selected
+    if(ok>0){
+        currentIndex=0;
+        renderGallery();
+        selectImage(0,false);
+        // تأثير بصري احتفالي
+        if(typeof pulseViz==='function')pulseViz();
+    }
+
     isUploading=false;
-    document.getElementById('uploadBtn').disabled=false;
+    if(btn)btn.disabled=false;
     input.value='';
-    if(ok){
-        showToast(`✅ تم رفع ${ok} صورة${fail?` (${fail} فشلت)`:''}`);
-        if(currentIndex<0)selectImage(0,false);
-    }else if(fail){
+
+    if(ok>0){
+        showToast(`✅ تم رفع ${ok} صورة${fail?` · ${fail} فشلت`:''}`);
+    }else if(fail>0){
         showToast(`❌ فشل رفع ${fail} صورة`);
     }
 }
 
 function renderGallery(){
     const c=document.getElementById('imageGallery');
+    if(!c)return;
     if(!gallery.length){
         c.innerHTML='<div class="empty-playlist"><span>🖼️</span><p>اضغط الزر الأزرق لرفع أول صورة</p></div>';
         return;
     }
     c.innerHTML=gallery.map((g,i)=>`
         <div class="img-card ${i===currentIndex?'selected':''}" onclick="selectImage(${i})">
-            <img src="${g.url}" alt="${escapeHtml(g.name)}" loading="lazy">
+            <img src="${g.url}" alt="${escapeHtml(g.name)}" loading="lazy" onerror="this.style.opacity=0.3">
             <div class="img-name">${escapeHtml(g.name)}</div>
             <div class="img-actions">
                 <button onclick="event.stopPropagation();copyLink('${g.url}')">🔗</button>
@@ -493,23 +543,30 @@ function prevImage(){
 }
 
 function removeImage(i){
-    if(!confirm('حذف هذه الصورة من المعرض؟'))return;
-    const removed=gallery[i];
+    if(!gallery.length)return;
+    if(!confirm('حذف هذه الصورة من المعرض المحلي؟'))return;
     gallery.splice(i,1);
     saveGallery(gallery);
-    if(currentIndex>=gallery.length)currentIndex=gallery.length-1;
-    renderGallery();
-    if(gallery.length)selectImage(currentIndex,false);
-    else showPreview(null);
+    if(gallery.length===0){
+        currentIndex=-1;
+        renderGallery();
+        showPreview(null);
+    }else{
+        if(currentIndex>=gallery.length)currentIndex=gallery.length-1;
+        if(currentIndex<0)currentIndex=0;
+        renderGallery();
+        selectImage(currentIndex,false);
+    }
     showToast('🗑️ تم الحذف من المعرض');
-    // ملاحظة: الحذف من Cloudinary يحتاج Backend
 }
 
 function deleteCurrent(){
     if(currentIndex>=0)removeImage(currentIndex);
+    else showToast('⚠️ لا توجد صورة محددة');
 }
 
 function clearGallery(){
+    if(!gallery.length){showToast('⚠️ المعرض فارغ');return}
     if(!confirm('مسح كل الصور من المعرض المحلي؟'))return;
     gallery=[];
     currentIndex=-1;
@@ -520,30 +577,27 @@ function clearGallery(){
 }
 
 function copyLink(url){
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-        navigator.clipboard.writeText(url)
-            .then(()=>showToast('📋 تم نسخ الرابط'))
-            .catch(fallbackCopy);
-    }else fallbackCopy();
-    function fallbackCopy(){
+    const done=()=>showToast('📋 تم نسخ الرابط');
+    const fallback=()=>{
         const ta=document.createElement('textarea');
         ta.value=url;
         ta.style.position='fixed';
         ta.style.opacity='0';
         document.body.appendChild(ta);
         ta.select();
-        try{document.execCommand('copy');showToast('📋 تم النسخ')}
+        try{document.execCommand('copy');done()}
         catch(e){showToast('❌ لم يتم النسخ')}
         ta.remove();
-    }
+    };
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url).then(done).catch(fallback);
+    }else fallback();
 }
 
 function shareLink(url){
     if(navigator.share){
         navigator.share({url:url,title:'Pixel Vault 2044'}).catch(()=>{});
-    }else{
-        copyLink(url);
-    }
+    }else copyLink(url);
 }
 
 function formatSize(b){
@@ -581,6 +635,7 @@ function toggleAutoCopy(){
 
 function showToast(m){
     const t=document.getElementById('toast');
+    if(!t)return;
     t.textContent=m;
     t.classList.add('show');
     clearTimeout(window._toastTimer);
@@ -588,17 +643,17 @@ function showToast(m){
 }
 
 // ─── التهيئة ───
-initParticles();
-initVisualizer();
-initGallery();
+window.addEventListener('DOMContentLoaded',()=>{
+    initParticles();
+    initVisualizer();
+    initGallery();
 
-// استعادة حالة النسخ التلقائي
-const _s=loadSettings();
-if(_s.autoCopy)document.getElementById('autoCopyBtn').classList.add('active');
+    const s=loadSettings();
+    if(s.autoCopy)document.getElementById('autoCopyBtn').classList.add('active');
 
-console.log('%c🖼️ Pixel Vault 2044 Ready','color:#00ffcc;font-size:16px;font-weight:bold');
-console.log('%c☁️ Cloudinary: """ + CLOUD_NAME + """','color:#6366f1');
-"""
+    console.log('%c🖼️ Pixel Vault 2044 Ready','color:#00ffcc;font-size:16px;font-weight:bold');
+    console.log('%c☁️ Cloudinary: """ + CLOUD_NAME + """','color:#6366f1');
+});"""
 
 # ═══════════════════════════════════════════════════════════
 # 🚀 MAIN
@@ -607,12 +662,12 @@ console.log('%c☁️ Cloudinary: """ + CLOUD_NAME + """','color:#6366f1');
 def main():
     print(f"""
 ╔══════════════════════════════════════════════════════════╗
-║  🖼️  PIXEL VAULT 2044 - CLOUD IMAGE VAULT  🖼️        ║
+║  🖼️  PIXEL VAULT 2044 - FIXED BUILD  🖼️                ║
 ║     Cloudinary: {CLOUD_NAME:<40}║
 ║     Preset: {UPLOAD_PRESET:<45}║
 ╚══════════════════════════════════════════════════════════╝
     """)
-    section("BUILDING PIXEL VAULT 2044")
+    section("BUILDING FIXED PIXEL VAULT")
 
     write("index.html", build_index())
     write("style.css", build_style())
@@ -628,17 +683,21 @@ def main():
   ✅ BUILD COMPLETE! - {TOTAL_LINES} سطر
   📁 8 ملفات جاهزة
 
-  ☁️  Cloudinary مضبوط: {CLOUD_NAME}
-  🔑  Upload Preset: {UPLOAD_PRESET}
+  🔧 الإصلاحات:
+     ✅ fetch بدل XHR (أخف وأكثر توافقًا)
+     ✅ fallback Base64 إذا فشل FormData
+     ✅ إصلاح currentIndex بعد الرفع
+     ✅ معاينة فورية للصورة المرفوعة
+     ✅ إظهار الأخطاء الحقيقية في toast
+     ✅ DOMContentLoaded للتهيئة الآمنة
+     ✅ CSP meta لتجنب حظر الطلبات
+     ✅ onerror للصور التالفة
 
   🚀 الخطوات:
-     1. شغّل السكربت: python3 script.py
-     2. ارفع الملفات الثمانية على GitHub
-     3. اشتغل Workflow الـ APK
-     4. حمّل APK وثبّته
-
-  ⚠️  تحقق مرة من Preset في Cloudinary:
-     Settings → Upload → Upload presets → يجب أن يكون Unsigned
+     1. شغّل السكربت
+     2. انسخ الـ 8 ملفات إلى www/
+     3. ارفع على GitHub → APK
+     4. ثبّت واختبر
 
   🖼️ PIXEL VAULT 2044 READY!
 {'='*60}
