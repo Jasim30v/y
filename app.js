@@ -6,6 +6,7 @@ function toggleInfo(){
     if(open){
         document.getElementById('aiSettingsPanel').style.display='none';
         document.getElementById('aiResultPanel').style.display='none';
+        document.getElementById('chatPanel').style.display='none';
     }
 }
 
@@ -14,7 +15,7 @@ function toggleAutoCopy(){
     s.autoCopy=!s.autoCopy;
     saveSettings(s);
     document.getElementById('autoCopyBtn').classList.toggle('active',s.autoCopy);
-    showToast(s.autoCopy?'✅ نسخ تلقائي مفعّل':'❌ نسخ تلقائي معطّل');
+    showToast(s.autoCopy?'✅ نسخ تلقائي':'❌ نسخ تلقائي');
 }
 
 function showToast(m){
@@ -33,5 +34,5 @@ window.addEventListener('DOMContentLoaded',()=>{
     initAI();
     const s=loadSettings();
     if(s.autoCopy)document.getElementById('autoCopyBtn').classList.add('active');
-    console.log('%c🧠 Pixel Vault AI Ready','color:#00ffcc;font-size:16px;font-weight:bold');
+    console.log('%c🧠 Pixel Vault Chat Ready','color:#00ffcc;font-size:16px;font-weight:bold');
 });

@@ -56,7 +56,7 @@ function renderGallery(){
             <div class="img-actions">
                 <button onclick="event.stopPropagation();copyLink('${g.url}')">🔗</button>
                 <button onclick="event.stopPropagation();shareLink('${g.url}')">📤</button>
-                <button class="ai" onclick="event.stopPropagation();selectImage(${i});analyzeCurrentImage();">🧠</button>
+                <button class="ai" onclick="event.stopPropagation();selectImage(${i});openChat();">💬</button>
                 <button class="danger" onclick="event.stopPropagation();removeImage(${i})">🗑️</button>
             </div>
         </div>
