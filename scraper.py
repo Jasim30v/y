@@ -1,0 +1,549 @@
+#!/usr/bin/env python3
+"""
+╔══════════════════════════════════════════════════════════════╗
+║                                                            ║
+║  🖼️  PIXEL VAULT 2044 - CLOUD IMAGE VAULT  🖼️           ║
+║     Generator - 9 Files                                    ║
+║                                                            ║
+║  📤  رفع صور سحابي (Cloudinary)                          ║
+║  🔗  توليد روابط مباشرة لكل صورة                          ║
+║  📋  نسخ / مشاركة / حذف                                    ║
+║  💾  معرض محلي مع تخزين دائم                               ║
+║  🎨  تصميم Glass Morphism نفسه                            ║
+║                                                            ║
+╚══════════════════════════════════════════════════════════════╝
+"""
+
+import os
+
+TOTAL_LINES = 0
+
+def write(filename, content):
+    global TOTAL_LINES
+    os.makedirs(os.path.dirname(filename) if os.path.dirname(filename) else '.', exist_ok=True)
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(content)
+    lines = content.count('\n') + 1
+    TOTAL_LINES += lines
+    print(f"  ✅ {filename} ({lines} سطر)")
+
+def section(title):
+    print(f"\n{'='*60}")
+    print(f"  🖼️ {title}")
+    print(f"{'='*60}")
+
+# ═══════════════════════════════════════════════════════════
+# 🖼️ 1. index.html
+# ═══════════════════════════════════════════════════════════
+
+def build_index():
+    return """<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🖼️ Pixel Vault 2044</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-void"></div>
+    <div class="bg-ring bg-ring-1"></div>
+    <div class="bg-ring bg-ring-2"></div>
+    <div class="bg-ring bg-ring-3"></div>
+    <div id="particlesContainer"></div>
+
+    <div class="app">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">🖼️</div>
+                <div class="header-text">
+                    <h1>Pixel Vault</h1>
+                    <span>✦ Cloud Image Vault ✦</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-icon" onclick="toggleSettings()" id="btnSettings"><i class="fas fa-cog"></i></button>
+                <button class="btn-icon" onclick="toggleInfo()" id="btnInfo"><i class="fas fa-circle-info"></i></button>
+            </div>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="visualizer-3d" id="visualizer3D">
+            <canvas id="vizCanvas"></canvas>
+            <div class="viz-overlay">
+                <div class="track-info">
+                    <div class="track-title" id="trackTitle">اختر صورة</div>
+                    <div class="track-artist" id="trackArtist">Pixel Vault 2044</div>
+                </div>
+                <div class="track-time">
+                    <span id="currentTime">—</span>
+                    <span id="totalTime">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress / Upload bar -->
+        <div class="progress-section">
+            <div class="progress-track" id="progressTrack">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-status" id="progressStatus">جاهز</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn"><i class="fas fa-copy"></i></button>
+            <button class="ctrl-btn" onclick="prevImage()"><i class="fas fa-backward-step"></i></button>
+            <button class="ctrl-play" id="uploadBtn" onclick="document.getElementById('imageInput').click()"><i class="fas fa-cloud-arrow-up" id="playIcon"></i></button>
+            <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this)">
+            <button class="ctrl-btn" onclick="nextImage()"><i class="fas fa-forward-step"></i></button>
+            <button class="ctrl-btn" onclick="deleteCurrent()" id="deleteBtn"><i class="fas fa-trash"></i></button>
+        </div>
+
+        <!-- Settings Panel (Cloudinary) -->
+        <div class="eq-panel" id="settingsPanel" style="display:none">
+            <div class="eq-header">
+                <h3>⚙️ إعدادات الرفع السحابي</h3>
+            </div>
+            <div class="settings-body">
+                <label class="settings-label">Cloud Name</label>
+                <input type="text" class="settings-input" id="cloudNameInput" placeholder="مثال: mycloud123">
+                <label class="settings-label">Upload Preset (Unsigned)</label>
+                <input type="text" class="settings-input" id="uploadPresetInput" placeholder="مثال: sonic_unsigned">
+                <button class="btn-action wide" onclick="saveCloudSettings()">💾 حفظ الإعدادات</button>
+                <p class="settings-hint">احصل على هذه القيم من cloudinary.com → Settings → Upload → Add upload preset (Unsigned).</p>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="lyrics-panel" id="infoPanel" style="display:none">
+            <div class="lyrics-header">
+                <h3>ℹ️ عن التطبيق</h3>
+            </div>
+            <div class="lyrics-content">
+                <p class="lyrics-line">📤 ارفع صورك إلى السحابة بضغطة</p>
+                <p class="lyrics-line">🔗 كل صورة تحصل على رابط مباشر</p>
+                <p class="lyrics-line">📋 انسخ أو شارك أو احذف</p>
+                <p class="lyrics-line">💾 معرضك محفوظ محليًا</p>
+            </div>
+        </div>
+
+        <!-- Gallery -->
+        <div class="playlist-section">
+            <div class="playlist-header">
+                <h3>🖼️ معرض الصور</h3>
+                <button class="btn-action" onclick="clearGallery()">🗑️ مسح الكل</button>
+            </div>
+            <div class="playlist image-gallery" id="imageGallery">
+                <div class="empty-playlist">
+                    <span>🖼️</span>
+                    <p>ارفع أول صورة لك</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="storage.js"></script>
+    <script src="particles.js"></script>
+    <script src="visualizer.js"></script>
+    <script src="uploader.js"></script>
+    <script src="gallery.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>"""
+
+# ═══════════════════════════════════════════════════════════
+# 🎨 2. style.css
+# ═══════════════════════════════════════════════════════════
+
+def build_style():
+    return """*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#050510;--card:rgba(10,10,30,0.85);--card2:rgba(15,15,40,0.7);--text:#e8e0f0;--text2:#9088a8;--text3:#504868;--accent:#00ffcc;--accent2:#ff44aa;--accent3:#ffaa00;--accent4:#6366f1;--glass:rgba(0,255,204,0.06);--border:rgba(0,255,204,0.12);--radius:24px;--radius-sm:16px;--radius-xs:12px}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;direction:rtl;user-select:none}
+
+.bg-void{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,255,204,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(255,68,170,0.03) 0%,transparent 60%),var(--bg)}
+.bg-ring{position:fixed;border-radius:50%;border:1px solid rgba(0,255,204,0.06);z-index:0;pointer-events:none;animation:ringRotate 30s linear infinite}
+.bg-ring-1{width:600px;height:600px;top:-200px;left:-100px;animation-duration:25s}
+.bg-ring-2{width:500px;height:500px;bottom:-150px;right:-80px;animation-duration:35s;animation-direction:reverse}
+.bg-ring-3{width:400px;height:400px;top:30%;left:40%;animation-duration:40s}
+@keyframes ringRotate{to{transform:rotate(360deg)}}
+
+.app{width:100%;max-width:520px;margin:0 auto;padding:12px;position:relative;z-index:1}
+
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo{width:46px;height:46px;background:var(--glass);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:24px;animation:logoGlow 3s ease-in-out infinite}
+@keyframes logoGlow{0%,100%{box-shadow:0 0 20px rgba(0,255,204,0.3)}50%{box-shadow:0 0 35px rgba(255,68,170,0.6)}}
+.header-text h1{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,#00ffcc,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-text span{font-size:7px;color:var(--text3);letter-spacing:3px}
+.header-right{display:flex;gap:6px}
+.btn-icon{width:38px;height:38px;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--text2);transition:all 0.3s}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent)}
+.btn-icon.active{background:var(--glass);border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px rgba(0,255,204,0.3)}
+
+/* Image Preview */
+.visualizer-3d{position:relative;width:100%;aspect-ratio:1;max-height:350px;background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:10px}
+.visualizer-3d canvas{width:100%;height:100%;display:none}
+.visualizer-3d .preview-img{width:100%;height:100%;object-fit:cover;display:none}
+.visualizer-3d.has-image .preview-img{display:block}
+.visualizer-3d.has-image canvas{display:none}
+.viz-overlay{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top,rgba(5,5,16,0.9),transparent)}
+.track-title{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:var(--accent);margin-bottom:2px;text-shadow:0 0 20px rgba(0,255,204,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-artist{font-size:11px;color:var(--text2)}
+.track-time{display:flex;justify-content:space-between;font-family:'Orbitron',sans-serif;font-size:10px;color:var(--accent2);margin-top:6px}
+
+/* Progress */
+.progress-section{padding:4px 0;margin-bottom:10px}
+.progress-track{width:100%;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;position:relative;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));border-radius:2px;width:0;transition:width 0.2s linear}
+.progress-status{text-align:center;font-size:9px;color:var(--text3);margin-top:6px;font-family:'Orbitron',sans-serif}
+
+/* Controls */
+.controls{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px}
+.ctrl-btn{width:42px;height:42px;background:var(--card2);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--text2);transition:all 0.3s}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ctrl-btn.active{border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px rgba(0,255,204,0.3)}
+.ctrl-play{width:60px;height:60px;background:linear-gradient(135deg,var(--accent),var(--accent4));border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;color:#000;box-shadow:0 8px 30px rgba(0,255,204,0.3);transition:all 0.3s}
+.ctrl-play:hover{transform:scale(1.05);box-shadow:0 12px 40px rgba(99,102,241,0.5)}
+.ctrl-play:active{transform:scale(0.95)}
+
+/* Settings Panel */
+.eq-panel{background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;animation:slideDown 0.4s ease}
+@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:600px}}
+.eq-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.eq-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--accent)}
+.settings-body{display:flex;flex-direction:column;gap:8px}
+.settings-label{font-size:11px;color:var(--text2);font-family:'Cairo',sans-serif}
+.settings-input{padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;outline:none}
+.settings-input:focus{border-color:var(--accent);box-shadow:0 0 15px rgba(0,255,204,0.2)}
+.settings-hint{font-size:9px;color:var(--text3);margin-top:4px;line-height:1.6}
+
+/* Info Panel */
+.lyrics-panel{background:var(--card);backdrop-filter:blur(40px);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;max-height:300px;overflow-y:auto;animation:slideDown 0.4s ease}
+.lyrics-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.lyrics-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--accent2)}
+.lyrics-line{padding:6px 0;font-size:12px;color:var(--text2);text-align:center;border-bottom:1px solid rgba(255,255,255,0.03)}
+
+/* Gallery */
+.playlist-section{margin-top:8px;padding-bottom:30px}
+.playlist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.playlist-header h3{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
+.btn-action{padding:7px 14px;background:var(--card2);border:1px solid var(--border);color:var(--accent);cursor:pointer;border-radius:20px;font-size:10px;font-family:'Cairo',sans-serif;transition:all 0.3s}
+.btn-action:hover{border-color:var(--accent);box-shadow:0 0 15px rgba(0,255,204,0.2)}
+.btn-action.wide{width:100%;margin-top:6px}
+.image-gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.img-card{position:relative;border-radius:var(--radius-sm);overflow:hidden;background:var(--card2);border:1px solid var(--border);transition:all 0.3s;cursor:pointer}
+.img-card:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(0,255,204,0.2)}
+.img-card.selected{border-color:var(--accent);box-shadow:0 0 25px rgba(0,255,204,0.4)}
+.img-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.img-card .img-name{position:absolute;top:0;left:0;right:0;padding:6px 8px;background:linear-gradient(to bottom,rgba(0,0,0,0.85),transparent);font-size:9px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.img-card .img-actions{position:absolute;bottom:0;left:0;right:0;display:flex;gap:3px;padding:5px;background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);opacity:0;transition:0.3s}
+.img-card:hover .img-actions,.img-card.selected .img-actions{opacity:1}
+.img-card .img-actions button{flex:1;background:rgba(0,255,204,0.2);border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:5px 2px;font-size:8px;cursor:pointer;font-family:'Cairo',sans-serif}
+.img-card .img-actions button.danger{background:rgba(255,68,68,0.2);border-color:#ff4466;color:#ff4466}
+.empty-playlist{text-align:center;padding:30px;color:var(--text3);grid-column:1/-1}
+.empty-playlist span{font-size:40px;display:block;margin-bottom:8px}
+
+.toast{position:fixed;bottom:35px;left:50%;transform:translateX(-50%) translateY(130px);background:var(--card);border:1px solid var(--accent);color:var(--text);padding:10px 22px;border-radius:25px;font-size:11px;z-index:300;transition:transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);font-family:'Cairo',sans-serif;max-width:80%;text-align:center}.toast.show{transform:translateX(-50%) translateY(0)}
+.particle{position:fixed;border-radius:50%;pointer-events:none;z-index:0}
+@keyframes particleFloat{0%{transform:translateY(110vh) scale(0);opacity:0}15%{opacity:0.7}85%{opacity:0.1}100%{transform:translateY(-10vh) scale(1.5);opacity:0}}
+
+@media(max-width:400px){.controls{gap:10px}}"""
+
+# ═══════════════════════════════════════════════════════════
+# 💾 3. storage.js
+# ═══════════════════════════════════════════════════════════
+
+def build_storage_js():
+    return """const KEYS={gallery:'pixelvault_gallery',settings:'pixelvault_settings'};
+function saveData(k,v){try{localStorage.setItem(k,JSON.stringify(v));return 1}catch(e){console.warn('storage full',e);return 0}}
+function loadData(k,d=null){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+
+function saveGallery(g){return saveData(KEYS.gallery,g)}
+function loadGallery(){return loadData(KEYS.gallery,[])}
+
+function saveSettings(s){return saveData(KEYS.settings,s)}
+function loadSettings(){return loadData(KEYS.settings,{cloudName:'',uploadPreset:'',autoCopy:false})}"""
+
+# ═══════════════════════════════════════════════════════════
+# ✨ 4. particles.js
+# ═══════════════════════════════════════════════════════════
+
+def build_particles_js():
+    return """function initParticles(){const c=document.getElementById('particlesContainer');c.innerHTML='';const cols=['#00ffcc','#ff44aa','#6366f1'];for(let i=0;i<40;i++){const p=document.createElement('div');p.className='particle';p.style.cssText=`left:${Math.random()*100}%;bottom:-10px;width:${Math.random()*4+1}px;height:${Math.random()*4+1}px;background:radial-gradient(circle,${cols[i%3]} 0%,transparent 70%);animation:particleFloat ${Math.random()*5+5}s ease-in infinite;animation-delay:${Math.random()*5}s`;c.appendChild(p)}}"""
+
+# ═══════════════════════════════════════════════════════════
+# 🎨 5. visualizer.js  (placeholder – عرض الصورة المحددة)
+# ═══════════════════════════════════════════════════════════
+
+def build_visualizer_js():
+    return """let previewImg=null;
+function initVisualizer(){
+    const box=document.getElementById('visualizer3D');
+    previewImg=document.createElement('img');
+    previewImg.className='preview-img';
+    box.insertBefore(previewImg,box.firstChild);
+}
+function showPreview(url,name){
+    const box=document.getElementById('visualizer3D');
+    if(!url){box.classList.remove('has-image');document.getElementById('trackTitle').innerText='اختر صورة';document.getElementById('trackArtist').innerText='Pixel Vault 2044';return}
+    previewImg.src=url;
+    box.classList.add('has-image');
+    document.getElementById('trackTitle').innerText=name||'صورة';
+    document.getElementById('trackArtist').innerText='Pixel Vault 2044';
+}"""
+
+# ═══════════════════════════════════════════════════════════
+# ☁️ 6. uploader.js (رفع سحابي)
+# ═══════════════════════════════════════════════════════════
+
+def build_uploader_js():
+    return """let cloudName='',uploadPreset='';
+
+function loadCloudConfig(){
+    const s=loadSettings();
+    cloudName=s.cloudName||'';
+    uploadPreset=s.uploadPreset||'';
+    document.getElementById('cloudNameInput').value=cloudName;
+    document.getElementById('uploadPresetInput').value=uploadPreset;
+    document.getElementById('autoCopyBtn').classList.toggle('active',!!s.autoCopy);
+}
+
+function saveCloudSettings(){
+    cloudName=document.getElementById('cloudNameInput').value.trim();
+    uploadPreset=document.getElementById('uploadPresetInput').value.trim();
+    if(!cloudName||!uploadPreset){showToast('❌ املأ الحقلين أولًا');return}
+    const s=loadSettings();
+    s.cloudName=cloudName;s.uploadPreset=uploadPreset;
+    saveSettings(s);
+    showToast('✅ تم الحفظ');
+}
+
+async function uploadImage(file){
+    if(!cloudName||!uploadPreset){showToast('⚙️ اضبط إعدادات Cloudinary أولًا');toggleSettings();return null}
+    if(!file.type.startsWith('image/')){showToast('❌ ليس ملف صورة');return null}
+
+    const fd=new FormData();
+    fd.append('file',file);
+    fd.append('upload_preset',uploadPreset);
+
+    try{
+        setProgress(5,'⏳ جاري الرفع...');
+        const xhr=new XMLHttpRequest();
+        const url=`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+        return await new Promise((resolve,reject)=>{
+            xhr.upload.onprogress=e=>{
+                if(e.lengthComputable)setProgress((e.loaded/e.total)*100,`⏳ ${Math.round((e.loaded/e.total)*100)}%`);
+            };
+            xhr.onload=()=>{
+                try{
+                    const data=JSON.parse(xhr.responseText);
+                    if(xhr.status>=200&&xhr.status<300){
+                        setProgress(100,'✅ تم الرفع');
+                        setTimeout(()=>setProgress(0,'جاهز'),1200);
+                        resolve({url:data.secure_url,publicId:data.public_id,name:file.name,size:file.size,at:Date.now()});
+                    }else{
+                        setProgress(0,'❌ فشل: '+((data.error&&data.error.message)||'خطأ'));
+                        reject(new Error((data.error&&data.error.message)||'upload failed'));
+                    }
+                }catch(err){setProgress(0,'❌ خطأ في الاستجابة');reject(err)}
+            };
+            xhr.onerror=()=>{setProgress(0,'❌ خطأ شبكة');reject(new Error('network'))};
+            xhr.open('POST',url);
+            xhr.send(fd);
+        });
+    }catch(e){
+        showToast('❌ '+e.message);
+        return null;
+    }
+}
+
+function setProgress(pct,status){
+    document.getElementById('progressFill').style.width=pct+'%';
+    document.getElementById('progressStatus').innerText=status||'';
+}"""
+
+# ═══════════════════════════════════════════════════════════
+# 🖼️ 7. gallery.js (إدارة المعرض)
+# ═══════════════════════════════════════════════════════════
+
+def build_gallery_js():
+    return """let gallery=[],currentIndex=-1;
+
+function initGallery(){
+    gallery=loadGallery();
+    renderGallery();
+    if(gallery.length){currentIndex=0;selectImage(0,false)}
+}
+
+async function handleFiles(input){
+    const files=Array.from(input.files||[]);
+    if(!files.length)return;
+    let ok=0;
+    for(const f of files){
+        const res=await uploadImage(f);
+        if(res){
+            gallery.unshift(res);
+            saveGallery(gallery);
+            renderGallery();
+            ok++;
+            if(loadSettings().autoCopy)copyLink(res.url);
+        }
+    }
+    input.value='';
+    if(ok){
+        showToast(`✅ تم رفع ${ok} صورة`);
+        if(currentIndex<0)selectImage(0,false);
+    }
+}
+
+function renderGallery(){
+    const c=document.getElementById('imageGallery');
+    if(!gallery.length){
+        c.innerHTML='<div class="empty-playlist"><span>🖼️</span><p>ارفع أول صورة لك</p></div>';
+        return;
+    }
+    c.innerHTML=gallery.map((g,i)=>`
+        <div class="img-card ${i===currentIndex?'selected':''}" onclick="selectImage(${i})">
+            <img src="${g.url}" alt="${escapeHtml(g.name)}" loading="lazy">
+            <div class="img-name">${escapeHtml(g.name)}</div>
+            <div class="img-actions">
+                <button onclick="event.stopPropagation();copyLink('${g.url}')">🔗 نسخ</button>
+                <button onclick="event.stopPropagation();shareLink('${g.url}')">📤 مشاركة</button>
+                <button class="danger" onclick="event.stopPropagation();removeImage(${i})">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function selectImage(i,silent=true){
+    if(i<0||i>=gallery.length)return;
+    currentIndex=i;
+    const g=gallery[i];
+    showPreview(g.url,g.name);
+    document.getElementById('currentTime').innerText=formatSize(g.size);
+    document.getElementById('totalTime').innerText=formatDate(g.at);
+    renderGallery();
+    if(silent)showToast('👁️ '+g.name);
+}
+
+function nextImage(){if(!gallery.length)return;selectImage((currentIndex+1)%gallery.length)}
+function prevImage(){if(!gallery.length)return;selectImage((currentIndex-1+gallery.length)%gallery.length)}
+
+function removeImage(i){
+    if(!confirm('حذف هذه الصورة من المعرض المحلي؟'))return;
+    gallery.splice(i,1);
+    saveGallery(gallery);
+    if(currentIndex>=gallery.length)currentIndex=gallery.length-1;
+    renderGallery();
+    if(gallery.length)selectImage(currentIndex,false);
+    else showPreview(null);
+    showToast('🗑️ تم الحذف');
+}
+
+function deleteCurrent(){if(currentIndex>=0)removeImage(currentIndex)}
+function clearGallery(){if(!confirm('مسح كل الصور من المعرض المحلي؟'))return;gallery=[];saveGallery([]);renderGallery();showPreview(null);showToast('🗑️ تم المسح')}
+
+function copyLink(url){
+    navigator.clipboard.writeText(url).then(()=>showToast('📋 تم نسخ الرابط')).catch(()=>{
+        const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast('📋 تم النسخ');
+    });
+}
+
+function shareLink(url){
+    if(navigator.share){navigator.share({url,title:'Pixel Vault 2044'}).catch(()=>{})}
+    else copyLink(url);
+}
+
+function formatSize(b){return b>1048576?(b/1048576).toFixed(1)+' MB':(b/1024).toFixed(1)+' KB'}
+function formatDate(ts){const d=new Date(ts);return d.toLocaleDateString('ar')+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}"""
+
+# ═══════════════════════════════════════════════════════════
+# ⚙️ 8. app.js
+# ═══════════════════════════════════════════════════════════
+
+def build_app_js():
+    return """function toggleSettings(){
+    const p=document.getElementById('settingsPanel');
+    p.style.display=p.style.display==='none'?'block':'none';
+    document.getElementById('btnSettings').classList.toggle('active',p.style.display==='block');
+    if(p.style.display==='block')document.getElementById('infoPanel').style.display='none';
+}
+
+function toggleInfo(){
+    const p=document.getElementById('infoPanel');
+    p.style.display=p.style.display==='none'?'block':'none';
+    document.getElementById('btnInfo').classList.toggle('active',p.style.display==='block');
+    if(p.style.display==='block')document.getElementById('settingsPanel').style.display='none';
+}
+
+function toggleAutoCopy(){
+    const s=loadSettings();
+    s.autoCopy=!s.autoCopy;
+    saveSettings(s);
+    document.getElementById('autoCopyBtn').classList.toggle('active',s.autoCopy);
+    showToast(s.autoCopy?'✅ نسخ تلقائي مفعّل':'❌ نسخ تلقائي معطّل');
+}
+
+function showToast(m){
+    const t=document.getElementById('toast');
+    t.textContent=m;
+    t.classList.add('show');
+    clearTimeout(window._toastTimer);
+    window._toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+initParticles();
+initVisualizer();
+initGallery();
+loadCloudConfig();
+if(!loadSettings().cloudName){setTimeout(()=>{showToast('⚙️ اضبط إعدادات Cloudinary');toggleSettings()},700)}
+"""
+
+# ═══════════════════════════════════════════════════════════
+# 🚀 MAIN
+# ═══════════════════════════════════════════════════════════
+
+def main():
+    print("""
+╔══════════════════════════════════════════════════════════╗
+║  🖼️  PIXEL VAULT 2044 - CLOUD IMAGE VAULT  🖼️        ║
+║     Generator - 8 Files                                  ║
+╚══════════════════════════════════════════════════════════╝
+    """)
+    section("BUILDING PIXEL VAULT 2044")
+
+    write("index.html", build_index())
+    write("style.css", build_style())
+    write("storage.js", build_storage_js())
+    write("particles.js", build_particles_js())
+    write("visualizer.js", build_visualizer_js())
+    write("uploader.js", build_uploader_js())
+    write("gallery.js", build_gallery_js())
+    write("app.js", build_app_js())
+
+    print(f"""
+{'='*60}
+  ✅ BUILD COMPLETE! - {TOTAL_LINES} خط
+  📁 8 ملفات
+
+  🖼️  معرض صور مع معاينة
+  ☁️  رفع سحابي عبر Cloudinary
+  🔗  توليد روابط + نسخ + مشاركة
+  💾  تخزين دائم محلي
+
+  🚀 للتشغيل:
+     افتح index.html في المتصفح
+
+  🖼️ PIXEL VAULT 2044 READY!
+{'='*60}
+    """)
+
+if __name__ == "__main__":
+    main()
