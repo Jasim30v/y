@@ -1,7 +1,12 @@
 function toggleInfo(){
     const p=document.getElementById('infoPanel');
-    p.style.display=p.style.display==='none'?'block':'none';
-    document.getElementById('btnInfo').classList.toggle('active',p.style.display==='block');
+    const open = p.style.display==='none';
+    p.style.display = open?'block':'none';
+    document.getElementById('btnInfo').classList.toggle('active', open);
+    if(open){
+        document.getElementById('aiSettingsPanel').style.display='none';
+        document.getElementById('aiResultPanel').style.display='none';
+    }
 }
 
 function toggleAutoCopy(){
@@ -21,15 +26,12 @@ function showToast(m){
     window._toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-// ─── التهيئة ───
 window.addEventListener('DOMContentLoaded',()=>{
     initParticles();
     initVisualizer();
     initGallery();
-
+    initAI();
     const s=loadSettings();
     if(s.autoCopy)document.getElementById('autoCopyBtn').classList.add('active');
-
-    console.log('%c🖼️ Pixel Vault 2044 Ready','color:#00ffcc;font-size:16px;font-weight:bold');
-    console.log('%c☁️ Cloudinary: dhu9l0lfs','color:#6366f1');
+    console.log('%c🧠 Pixel Vault AI Ready','color:#00ffcc;font-size:16px;font-weight:bold');
 });

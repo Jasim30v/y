@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; img-src * data: blob:; connect-src *;">
-    <title>🖼️ Pixel Vault 2044</title>
+    <title>🧠 Pixel Vault 2044 + AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -17,19 +17,22 @@
     <div id="particlesContainer"></div>
 
     <div class="app">
+        <!-- Header -->
         <div class="header">
             <div class="header-left">
-                <div class="logo">🖼️</div>
+                <div class="logo">🧠</div>
                 <div class="header-text">
-                    <h1>Pixel Vault</h1>
-                    <span>✦ Cloud Image Vault ✦</span>
+                    <h1>Pixel Vault AI</h1>
+                    <span>✦ Vision Enabled ✦</span>
                 </div>
             </div>
             <div class="header-right">
-                <button class="btn-icon" onclick="toggleInfo()" id="btnInfo"><i class="fas fa-circle-info"></i></button>
+                <button class="btn-icon" onclick="toggleAISettings()" id="btnAI" title="إعدادات AI"><i class="fas fa-robot"></i></button>
+                <button class="btn-icon" onclick="toggleInfo()" id="btnInfo" title="معلومات"><i class="fas fa-circle-info"></i></button>
             </div>
         </div>
 
+        <!-- Image Preview -->
         <div class="visualizer-3d" id="visualizer3D">
             <canvas id="vizCanvas"></canvas>
             <img class="preview-img" id="previewImg" alt="">
@@ -45,13 +48,15 @@
             </div>
         </div>
 
+        <!-- Progress -->
         <div class="progress-section">
             <div class="progress-track">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="progress-status" id="progressStatus">جاهز للرفع</div>
+            <div class="progress-status" id="progressStatus">جاهز</div>
         </div>
 
+        <!-- Controls -->
         <div class="controls">
             <button class="ctrl-btn" onclick="toggleAutoCopy()" id="autoCopyBtn" title="نسخ تلقائي"><i class="fas fa-copy"></i></button>
             <button class="ctrl-btn" onclick="prevImage()"><i class="fas fa-backward-step"></i></button>
@@ -61,19 +66,73 @@
             <button class="ctrl-btn" onclick="deleteCurrent()" title="حذف"><i class="fas fa-trash"></i></button>
         </div>
 
+        <!-- AI Action Bar -->
+        <div class="ai-action-bar">
+            <button class="ai-btn gemini-btn" onclick="sendToGemini()">
+                <i class="fas fa-comment-dots"></i> أرسل إلى Gemini
+            </button>
+            <button class="ai-btn chatgpt-btn" onclick="sendToChatGPT()">
+                <i class="fas fa-comment"></i> أرسل إلى ChatGPT
+            </button>
+        </div>
+
+        <div class="ai-action-bar">
+            <button class="ai-btn analyze-btn" onclick="analyzeCurrentImage()" id="aiAnalyzeBtn">
+                <i class="fas fa-brain"></i> حلّل داخل التطبيق
+            </button>
+        </div>
+
+        <!-- AI Settings Panel -->
+        <div class="lyrics-panel" id="aiSettingsPanel" style="display:none">
+            <div class="lyrics-header">
+                <h3>🧠 إعدادات الذكاء الاصطناعي</h3>
+            </div>
+            <div class="lyrics-content">
+                <p class="ai-label">مفتاح Gemini API (للتحليل الداخلي):</p>
+                <input type="password" class="ai-input" id="geminiKey" placeholder="AIza...">
+                <p class="ai-hint">🔗 احصل عليه من: https://aistudio.google.com/apikey</p>
+
+                <p class="ai-label">لغة التحليل:</p>
+                <select class="ai-select" id="aiLang">
+                    <option value="ar">العربية</option>
+                    <option value="en">English</option>
+                </select>
+
+                <button class="btn-action wide" onclick="saveAISettings()">💾 حفظ الإعدادات</button>
+            </div>
+        </div>
+
+        <!-- AI Result Panel -->
+        <div class="ai-result-panel" id="aiResultPanel" style="display:none">
+            <div class="ai-result-header">
+                <h3><i class="fas fa-brain"></i> نتيجة التحليل</h3>
+                <button class="btn-action small" onclick="closeAIResult()">✕</button>
+            </div>
+            <div class="ai-result-content" id="aiResultContent">
+                <p class="ai-placeholder">لم يتم التحليل بعد</p>
+            </div>
+            <div class="ai-result-actions">
+                <button class="btn-action small" onclick="copyAIResult()">📋 نسخ</button>
+                <button class="btn-action small" onclick="analyzeCurrentImage()">🔄 إعادة</button>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
         <div class="lyrics-panel" id="infoPanel" style="display:none">
             <div class="lyrics-header">
                 <h3>ℹ️ عن التطبيق</h3>
             </div>
             <div class="lyrics-content">
-                <p class="lyrics-line">📤 ارفع صورك إلى السحابة بضغطة</p>
-                <p class="lyrics-line">🔗 كل صورة تحصل على رابط مباشر</p>
+                <p class="lyrics-line">📤 ارفع صورك إلى Cloudinary</p>
+                <p class="lyrics-line">🔗 احصل على رابط مباشر لكل صورة</p>
+                <p class="lyrics-line">💬 أرسل الرابط إلى Gemini أو ChatGPT</p>
+                <p class="lyrics-line">🧠 أو حلّل الصورة داخل التطبيق</p>
                 <p class="lyrics-line">📋 انسخ أو شارك أو احذف</p>
                 <p class="lyrics-line">💾 معرضك محفوظ محليًا</p>
-                <p class="lyrics-line">☁️ مرتبط بحساب Cloudinary</p>
             </div>
         </div>
 
+        <!-- Gallery -->
         <div class="playlist-section">
             <div class="playlist-header">
                 <h3>🖼️ معرض الصور</h3>
@@ -95,6 +154,7 @@
     <script src="visualizer.js"></script>
     <script src="uploader.js"></script>
     <script src="gallery.js"></script>
+    <script src="ai.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
